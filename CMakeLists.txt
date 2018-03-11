@@ -7,4 +7,4 @@ set(CMAKE_CXX_STANDARD 17)
 include_directories(deps include)
 
 add_subdirectory(src)
-#add_subdirectory(test)
+add_subdirectory(test)
