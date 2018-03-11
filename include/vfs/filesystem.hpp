@@ -2,30 +2,31 @@
 #define OBJD_CPP_FS_FILESYSTEM_H
 
 #include <functional>
-#include <objd-fs/fs/path.hpp>
+#include <vfs/path.hpp>
 
-namespace objd::fs
+namespace vfs
 {
     using std::vector;
     using std::function;
 
-    using path = objd::fs::path;
+    template<typename t_stat, typename t_file, typename t_buf = vector<uint8_t>>
+    typedef filesystem <t_stat, t_file, t_buf> fs;
 
     template<typename t_stat, typename t_file, typename t_buf = vector<uint8_t>>
     class filesystem
     {
     public:
-        typedef function<void(path &, int, bool)> exists_cb;
-        typedef function<void(path &, int, t_stat)> stat_cb;
-        typedef function<void(path &, int)> mkdir_cb;
-        typedef function<void(path &, int)> mkdirs_cb;
-        typedef function<void(path &, int)> create_cb;
-        typedef function<void(path &, path &, int)> move_cb;
-        typedef function<void(path &, path &, int)> copy_cb;
-        typedef function<void(path &, path &, int)> link_cb;
-        typedef function<void(path &, path &, int)> symlink_cb;
-        typedef function<void(path &, int)> unlink_cb;
-        typedef function<void(path &, int, t_file)> open_cb;
+        typedef function<void(path & , int, bool)> exists_cb;
+        typedef function<void(path & , int, t_stat)> stat_cb;
+        typedef function<void(path & , int)> mkdir_cb;
+        typedef function<void(path & , int)> mkdirs_cb;
+        typedef function<void(path & , int)> create_cb;
+        typedef function<void(path & , path & , int)> move_cb;
+        typedef function<void(path & , path & , int)> copy_cb;
+        typedef function<void(path & , path & , int)> link_cb;
+        typedef function<void(path & , path & , int)> symlink_cb;
+        typedef function<void(path & , int)> unlink_cb;
+        typedef function<void(path & , int, t_file)> open_cb;
         typedef function<void(t_file &, int, t_stat)> fstat_cb;
         typedef function<void(t_file &, int, t_buf &)> read_cb;
         typedef function<void(t_file &, int, t_buf &)> write_cb;

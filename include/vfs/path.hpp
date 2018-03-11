@@ -1,9 +1,10 @@
-#ifndef OBJD_CPP_FS_PATH_H
-#define OBJD_CPP_FS_PATH_H
+#ifndef VFS_CPP_PATH_H
+#define VFS_CPP_PATH_H
 
 #include <string>
+#include <iostream>
 
-namespace objd::fs
+namespace vfs
 {
     using std::string;
     using std::ostream;

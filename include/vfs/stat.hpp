@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-namespace objd::fs
+namespace vfs
 {
     class stat
     {
