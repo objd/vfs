@@ -9,26 +9,26 @@ namespace vfs
     using std::vector;
     using std::function;
 
-    template<typename t_stat, typename t_file, typename t_buf>
-    struct filesystem_cbs
-    {
-        typedef function<void(vfs::path &, int, bool)> exists_cb;
-        typedef function<void(vfs::path &, int, t_stat)> stat_cb;
-        typedef function<void(vfs::path &, int)> mkdir_cb;
-        typedef function<void(vfs::path &, int)> mkdirs_cb;
-        typedef function<void(vfs::path &, int)> create_cb;
-        typedef function<void(vfs::path &, vfs::path &, int)> move_cb;
-        typedef function<void(vfs::path &, vfs::path &, int)> copy_cb;
-        typedef function<void(vfs::path &, vfs::path &, int)> link_cb;
-        typedef function<void(vfs::path &, vfs::path &, int)> symlink_cb;
-        typedef function<void(vfs::path &, int)> unlink_cb;
-        typedef function<void(vfs::path &, int, t_file)> open_cb;
-        typedef function<void(t_file &, int, t_stat)> fstat_cb;
-        typedef function<void(t_file &, int, t_buf &)> read_cb;
-        typedef function<void(t_file &, int, t_buf &)> write_cb;
-        typedef function<void(t_file &, int, uint64_t)> truncate_cb;
-        typedef function<void(t_file &, int)> close_cb;
-    };
+//    template<typename t_stat, typename t_file, typename t_buf>
+//    struct filesystem_cbs
+//    {
+//        typedef function<void(vfs::path &, int, bool)> exists_cb;
+//        typedef function<void(vfs::path &, int, t_stat)> stat_cb;
+//        typedef function<void(vfs::path &, int)> mkdir_cb;
+//        typedef function<void(vfs::path &, int)> mkdirs_cb;
+//        typedef function<void(vfs::path &, int)> create_cb;
+//        typedef function<void(vfs::path &, vfs::path &, int)> move_cb;
+//        typedef function<void(vfs::path &, vfs::path &, int)> copy_cb;
+//        typedef function<void(vfs::path &, vfs::path &, int)> link_cb;
+//        typedef function<void(vfs::path &, vfs::path &, int)> symlink_cb;
+//        typedef function<void(vfs::path &, int)> unlink_cb;
+//        typedef function<void(vfs::path &, int, t_file)> open_cb;
+//        typedef function<void(t_file &, int, t_stat)> fstat_cb;
+//        typedef function<void(t_file &, int, t_buf &)> read_cb;
+//        typedef function<void(t_file &, int, t_buf &)> write_cb;
+//        typedef function<void(t_file &, int, uint64_t)> truncate_cb;
+//        typedef function<void(t_file &, int)> close_cb;
+//    };
 
 //    template<typename t_stat, typename t_file, typename t_buf>
 //    typedef function<void(vfs::path &, int, bool)> exists_cb;
@@ -92,7 +92,7 @@ namespace vfs
         typedef function<void(vfs::path &, vfs::path &, int)> link_cb;
         typedef function<void(vfs::path &, vfs::path &, int)> symlink_cb;
         typedef function<void(vfs::path &, int)> unlink_cb;
-        typedef function<void(vfs::path &, int, t_file)> open_cb;
+        typedef function<void(vfs::path &, int, t_file &)> open_cb;
         typedef function<void(t_file &, int, t_stat)> fstat_cb;
         typedef function<void(t_file &, int, t_buf &)> read_cb;
         typedef function<void(t_file &, int, t_buf &)> write_cb;
