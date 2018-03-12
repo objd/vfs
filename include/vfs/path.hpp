@@ -6,22 +6,19 @@
 
 namespace vfs
 {
-    using std::string;
-    using std::ostream;
-
     class path
     {
     private:
-        string _value;
+        std::string _value;
 
     public:
         path() : _value("")
         {}
 
-        explicit path(string &value) : _value(value)
+        explicit path(std::string &value) : _value(value)
         {}
 
-        explicit path(string &&value) : _value(value)
+        explicit path(std::string &&value) : _value(std::move(value))
         {}
 
         path(const path &other) : _value(other._value) // NOLINT
@@ -30,7 +27,7 @@ namespace vfs
         path(path &&other) noexcept : _value(std::move(other._value))
         {}
 
-        friend inline ostream &operator<<(ostream &os, const path &path)
+        friend inline std::ostream &operator<<(std::ostream &os, const path &path)
         {
             os << path._value;
             return os;
@@ -54,22 +51,29 @@ namespace vfs
         inline path &prepend(path &path) noexcept
         {
             bool requires_sep = !has_leading_separator() && !path.has_trailing_separator();
+            bool requires_trim = has_leading_separator() && path.has_trailing_separator();
 
             if (requires_sep)
             {
                 _value.insert(0, separator());
             }
+            else if (requires_trim)
+            {
+                _value.erase(0, 1);
+            }
 
             _value.insert(0, path._value);
+
+            return *this;
         }
 
-        inline path &prepend(string &val) noexcept
+        inline path &prepend(std::string &val) noexcept
         {
             path path {val};
             return prepend(path);
         }
 
-        inline path &prepend(string &&val) noexcept
+        inline path &prepend(std::string &&val) noexcept
         {
             path path {val};
             return prepend(path);
@@ -78,22 +82,29 @@ namespace vfs
         inline path &append(path &path) noexcept
         {
             bool requires_sep = !has_trailing_separator() && !path.has_leading_separator();
+            bool requires_trim = has_trailing_separator() && path.has_leading_separator();
 
             if (requires_sep)
             {
                 _value.append(separator());
             }
+            else if (requires_trim)
+            {
+                _value.resize(_value.size() - 1);
+            }
 
             _value.append(path._value);
+
+            return *this;
         }
 
-        inline path &append(string &val) noexcept
+        inline path &append(std::string &val) noexcept
         {
             path path {val};
             return append(path);
         }
 
-        inline path &append(string &&val) noexcept
+        inline path &append(std::string &&val) noexcept
         {
             path path {val};
             return append(path);
@@ -177,7 +188,7 @@ namespace vfs
             }
 
             path parent {_value};
-            string &parent_val = parent._value;
+            std::string &parent_val = parent._value;
 
             if (has_trailing_separator())
             {
@@ -198,7 +209,7 @@ namespace vfs
             }
 
             path filename {_value};
-            string &filename_val = filename._value;
+            std::string &filename_val = filename._value;
 
             if (has_trailing_separator())
             {
@@ -216,7 +227,7 @@ namespace vfs
             return path {*this};
         }
 
-        inline const string str() const noexcept
+        inline const std::string str() const noexcept
         {
             return _value;
         }
@@ -232,9 +243,9 @@ namespace vfs
             return '/';
         }
 
-        inline const string &separator() const
+        inline const std::string &separator() const
         {
-            static const string s {separator_c()};
+            static const std::string s {separator_c()};
             return s;
         }
 
@@ -245,7 +256,7 @@ namespace vfs
 
         inline bool has_trailing_separator() const
         {
-            return *_value.end() == separator_c();
+            return *(_value.end() - 1) == separator_c();
         }
 
         inline bool is_root()

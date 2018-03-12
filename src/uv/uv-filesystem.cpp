@@ -560,7 +560,7 @@ struct read_cb_data
     read_cb cb;
 };
 
-int vfs::uv::uv_filesystem::read(uv_file &file, vfs::buffer &&buf, off64_t off, read_cb cb) noexcept
+int vfs::uv::uv_filesystem::read(uv_file &file, vfs::buffer &buf, off64_t off, read_cb cb) noexcept
 {
     auto d = new read_cb_data {
         .buf = std::move(buf),
@@ -582,9 +582,7 @@ int vfs::uv::uv_filesystem::read(uv_file &file, vfs::buffer &&buf, off64_t off, 
 
         if (req->result < 0)
         {
-            vfs::buffer dummy;
-
-            data->cb(data->f, get_uv_error(req), dummy);
+            data->cb(data->f, get_uv_error(req), data->buf);
         }
         else
         {

@@ -11,15 +11,12 @@ int main()
 
     fs.open(path, 0, UV_FS_O_RDONLY, [&fs](vfs::path &p, int err, uv_file &f)
     {
-//        auto buf = new vfs::buffer {8192};
         vfs::buffer buf {8192};
 
-        fs.read(f, std::move(buf), 0l, [&fs, &buf](uv_file &f, int err, vfs::buffer &b)
+        fs.read(f, buf, 0l, [&fs, &buf](uv_file &f, int err, vfs::buffer &b)
         {
             std::string s {b.begin(), b.end()};
             std::cout << s << std::endl;
-
-            delete buf;
 
             fs.close(f, [&fs](uv_file &f, int err)
             {
