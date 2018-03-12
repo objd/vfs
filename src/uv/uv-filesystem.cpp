@@ -9,22 +9,22 @@
 
 using std::vector;
 
-using exists_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::exists_cb;
-using stat_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::stat_cb;
-using mkdir_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::mkdir_cb;
-using mkdirs_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::mkdirs_cb;
-using create_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::create_cb;
-using move_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::move_cb;
-using copy_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::copy_cb;
-using link_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::link_cb;
-using symlink_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::symlink_cb;
-using unlink_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::unlink_cb;
-using open_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::open_cb;
-using fstat_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::fstat_cb;
-using read_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::read_cb;
-using write_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::write_cb;
-using truncate_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::truncate_cb;
-using close_cb = typename vfs::filesystem<uv_stat_t, uv_file, std::vector<char>>::close_cb;
+using exists_cb = typename vfs::filesystem<uv_stat_t, uv_file>::exists_cb;
+using stat_cb = typename vfs::filesystem<uv_stat_t, uv_file>::stat_cb;
+using mkdir_cb = typename vfs::filesystem<uv_stat_t, uv_file>::mkdir_cb;
+using mkdirs_cb = typename vfs::filesystem<uv_stat_t, uv_file>::mkdirs_cb;
+using create_cb = typename vfs::filesystem<uv_stat_t, uv_file>::create_cb;
+using move_cb = typename vfs::filesystem<uv_stat_t, uv_file>::move_cb;
+using copy_cb = typename vfs::filesystem<uv_stat_t, uv_file>::copy_cb;
+using link_cb = typename vfs::filesystem<uv_stat_t, uv_file>::link_cb;
+using symlink_cb = typename vfs::filesystem<uv_stat_t, uv_file>::symlink_cb;
+using unlink_cb = typename vfs::filesystem<uv_stat_t, uv_file>::unlink_cb;
+using open_cb = typename vfs::filesystem<uv_stat_t, uv_file>::open_cb;
+using fstat_cb = typename vfs::filesystem<uv_stat_t, uv_file>::fstat_cb;
+using read_cb = typename vfs::filesystem<uv_stat_t, uv_file>::read_cb;
+using write_cb = typename vfs::filesystem<uv_stat_t, uv_file>::write_cb;
+using truncate_cb = typename vfs::filesystem<uv_stat_t, uv_file>::truncate_cb;
+using close_cb = typename vfs::filesystem<uv_stat_t, uv_file>::close_cb;
 
 // </editor-fold>
 
@@ -555,23 +555,23 @@ int vfs::uv::uv_filesystem::stat(uv_file &file, fstat_cb cb) noexcept
 
 struct read_cb_data
 {
+    vfs::buffer buf;
     uv_file f;
-    vector<char> &buf;
     read_cb cb;
 };
 
-int vfs::uv::uv_filesystem::read(uv_file &file, vector<char> &buf, off64_t off, read_cb cb) noexcept
+int vfs::uv::uv_filesystem::read(uv_file &file, vfs::buffer &&buf, off64_t off, read_cb cb) noexcept
 {
     auto d = new read_cb_data {
+        .buf = std::move(buf),
         .f = file,
-        .buf = buf,
         .cb = cb
     };
 
     auto r = new uv_fs_t {.data = d};
 
     uv_buf_t bufs[] = {
-        {.base = buf.data(), .len = buf.size()}
+        {.base = d->buf.data<char>(), .len = d->buf.capacity()}
     };
 
     auto result = uv_fs_read(_uv_loop, r, file, bufs, 1, off, [](uv_fs_t *req)
@@ -582,12 +582,16 @@ int vfs::uv::uv_filesystem::read(uv_file &file, vector<char> &buf, off64_t off, 
 
         if (req->result < 0)
         {
-            vector<char> dummy;
+            vfs::buffer dummy;
 
             data->cb(data->f, get_uv_error(req), dummy);
         }
         else
         {
+            auto n_read = static_cast<uint64_t>(req->result);
+
+            data->buf.truncate(n_read);
+
             data->cb(data->f, 0, data->buf);
         }
 
@@ -615,7 +619,7 @@ struct write_cb_data
     write_cb cb;
 };
 
-int vfs::uv::uv_filesystem::write(uv_file &file, vector<char> &buf, off64_t off, write_cb cb) noexcept
+int vfs::uv::uv_filesystem::write(uv_file &file, vfs::buffer &buf, off64_t off, write_cb cb) noexcept
 {
     return 0;
 }

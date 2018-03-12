@@ -48,7 +48,7 @@ namespace vfs
 //        typedef typename uv_filesystem_i::truncate_cb    truncate_cb;
 //        typedef typename uv_filesystem_i::close_cb       close_cb;
 
-        class uv_filesystem : public filesystem<uv_stat_t, uv_file, std::vector<char>>
+        class uv_filesystem : public filesystem<uv_stat_t, uv_file>
         {
         private:
             uv_loop_t *_uv_loop;
@@ -71,8 +71,8 @@ namespace vfs
             int unlink(vfs::path &path, unlink_cb cb) noexcept override;
             int open(vfs::path &path, int32_t mode, int32_t flags, open_cb cb) noexcept override;
             int stat(uv_file &file, fstat_cb cb) noexcept override;
-            int read(uv_file &file, vector<char> &buf, off64_t off, read_cb cb) noexcept override;
-            int write(uv_file &file, vector<char> &buf, off64_t off, write_cb cb) noexcept override;
+            int read(uv_file &file, vfs::buffer &buf, off64_t off, read_cb cb) noexcept override;
+            int write(uv_file &file, vfs::buffer &buf, off64_t off, write_cb cb) noexcept override;
             int truncate(uv_file &file, uint64_t size, off64_t off, truncate_cb cb) noexcept override;
             int close(uv_file &file, close_cb cb) noexcept override;
         };
