@@ -6,6 +6,20 @@
 
 namespace vfs
 {
+    namespace paths
+    {
+        constexpr inline const char separator_c()
+        {
+            return '/';
+        }
+
+        inline const std::string &separator()
+        {
+            static const std::string s {vfs::paths::separator_c()};
+            return s;
+        }
+    }
+
     class path
     {
     private:
@@ -48,14 +62,14 @@ namespace vfs
             return _value == other._value;
         }
 
-        inline path &prepend(path &path) noexcept
+        path &prepend(path &path) noexcept
         {
             bool requires_sep = !has_leading_separator() && !path.has_trailing_separator();
             bool requires_trim = has_leading_separator() && path.has_trailing_separator();
 
             if (requires_sep)
             {
-                _value.insert(0, separator());
+                _value.insert(0, vfs::paths::separator());
             }
             else if (requires_trim)
             {
@@ -79,14 +93,14 @@ namespace vfs
             return prepend(path);
         }
 
-        inline path &append(path &path) noexcept
+        path &append(path &path) noexcept
         {
             bool requires_sep = !has_trailing_separator() && !path.has_leading_separator();
             bool requires_trim = has_trailing_separator() && path.has_leading_separator();
 
             if (requires_sep)
             {
-                _value.append(separator());
+                _value.append(vfs::paths::separator());
             }
             else if (requires_trim)
             {
@@ -180,7 +194,7 @@ namespace vfs
 //            }
 //        }
 
-        inline path parent() noexcept
+        path &&parent() noexcept
         {
             if (is_root())
             {
@@ -195,13 +209,13 @@ namespace vfs
                 parent_val.erase(parent_val.end() - 1);
             }
 
-            auto index = parent_val.rfind(separator_c());
+            auto index = parent_val.rfind(vfs::paths::separator_c());
             parent_val.erase(index);
 
-            return parent;
+            return std::move(parent);
         }
 
-        inline path filename() noexcept
+        inline path &&filename() noexcept
         {
             if (is_root())
             {
@@ -216,15 +230,15 @@ namespace vfs
                 filename_val.erase(filename_val.end() - 1);
             }
 
-            auto index = filename_val.rfind(separator_c());
+            auto index = filename_val.rfind(vfs::paths::separator_c());
             filename_val.erase(0, index);
 
-            return filename;
+            return std::move(filename);
         }
 
-        inline path clone() const noexcept
+        inline path &&clone() const noexcept
         {
-            return path {*this};
+            return std::move(path {*this});
         }
 
         inline const std::string str() const noexcept
@@ -238,30 +252,20 @@ namespace vfs
         }
 
     private:
-        constexpr inline const char separator_c() const
-        {
-            return '/';
-        }
-
-        inline const std::string &separator() const
-        {
-            static const std::string s {separator_c()};
-            return s;
-        }
 
         inline bool has_leading_separator() const
         {
-            return *_value.begin() == separator_c();
+            return *_value.begin() == vfs::paths::separator_c();
         }
 
         inline bool has_trailing_separator() const
         {
-            return *(_value.end() - 1) == separator_c();
+            return *(_value.end() - 1) == vfs::paths::separator_c();
         }
 
         inline bool is_root()
         {
-            return _value == separator();
+            return _value == vfs::paths::separator();
         }
     };
 }
