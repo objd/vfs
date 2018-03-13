@@ -62,6 +62,26 @@ namespace vfs
             return _value == other._value;
         }
 
+        inline bool is_absolute()
+        {
+            return has_leading_separator();
+        }
+
+        inline bool is_relative()
+        {
+            return !has_leading_separator();
+        }
+
+        inline bool is_valid()
+        {
+            static const std::string double_separator {
+                vfs::paths::separator_c(),
+                vfs::paths::separator_c()
+            };
+
+            return !_value.empty() && !_value.find(double_separator) > -1;
+        }
+
         path &prepend(path &path) noexcept
         {
             bool requires_sep = !has_leading_separator() && !path.has_trailing_separator();
@@ -69,7 +89,7 @@ namespace vfs
 
             if (requires_sep)
             {
-                _value.insert(0, vfs::paths::separator());
+                _value.insert(_value.begin(), vfs::paths::separator_c());
             }
             else if (requires_trim)
             {
@@ -100,7 +120,7 @@ namespace vfs
 
             if (requires_sep)
             {
-                _value.append(vfs::paths::separator());
+                _value.insert(_value.end(), vfs::paths::separator_c());
             }
             else if (requires_trim)
             {
@@ -241,7 +261,7 @@ namespace vfs
             return std::move(path {*this});
         }
 
-        inline const std::string str() const noexcept
+        inline const std::string &str() const noexcept
         {
             return _value;
         }
