@@ -72,14 +72,14 @@ namespace vfs
             return !has_leading_separator();
         }
 
-        inline bool is_valid()
+        bool is_valid()
         {
             static const std::string double_separator {
                 vfs::paths::separator_c(),
                 vfs::paths::separator_c()
             };
 
-            return !_value.empty() && !_value.find(double_separator) > -1;
+            return !_value.empty() && _value.find(double_separator) == -1;
         }
 
         path &prepend(path &path) noexcept

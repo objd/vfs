@@ -28,10 +28,15 @@ namespace
 
         // <editor-fold name="Given">
 
-//        void given_an_empty_path_value()
-//        {
-//            _value = std::string {""};
-//        }
+        void given_an_empty_path_value()
+        {
+            _value = std::string {""};
+        }
+
+        void given_an_path_value_with_a_double_separator()
+        {
+            _value = std::string {"/data//vfs"};
+        }
 
         void given_the_root_path_value()
         {
@@ -124,6 +129,16 @@ namespace
 
         // <editor-fold name="Then">
 
+        void then_true_is_returned()
+        {
+            REQUIRE (_bool_result);
+        }
+
+        void then_false_is_returned()
+        {
+            REQUIRE (!_bool_result);
+        }
+
         void then_the_returned_path_is_the_path()
         {
             REQUIRE (&_path == _path_ptr_result);
@@ -188,6 +203,151 @@ namespace
 
         // </editor-fold>
     };
+
+
+    // <editor-fold name="Is Absolute">
+
+    TEST_CASE("It should return the path is absolute if value is absolute")
+    {
+        test t;
+
+        t.given_an_absolute_path_value();
+        t.given_a_path();
+
+        t.when_is_absolute_of_path_is_invoked();
+
+        t.then_true_is_returned();
+    }
+
+    TEST_CASE("It should return the path is absolute if value is root")
+    {
+        test t;
+
+        t.given_the_root_path_value();
+        t.given_a_path();
+
+        t.when_is_absolute_of_path_is_invoked();
+
+        t.then_true_is_returned();
+    }
+
+    TEST_CASE("It should return the path is not absolute if value is relative")
+    {
+        test t;
+
+        t.given_a_relative_path_value();
+        t.given_a_path();
+
+        t.when_is_absolute_of_path_is_invoked();
+
+        t.then_false_is_returned();
+    }
+
+    // </editor-fold>
+
+    // <editor-fold name="Is Relative">
+
+    TEST_CASE("It should return the path is relative if value is relative")
+    {
+        test t;
+
+        t.given_a_relative_path_value();
+        t.given_a_path();
+
+        t.when_is_relative_of_path_is_invoked();
+
+        t.then_true_is_returned();
+    }
+
+    TEST_CASE("It should return the path is not relative if value is root")
+    {
+        test t;
+
+        t.given_the_root_path_value();
+        t.given_a_path();
+
+        t.when_is_relative_of_path_is_invoked();
+
+        t.then_false_is_returned();
+    }
+
+    TEST_CASE("It should return the path is not relative if value is absolute")
+    {
+        test t;
+
+        t.given_an_absolute_path_value();
+        t.given_a_path();
+
+        t.when_is_relative_of_path_is_invoked();
+
+        t.then_false_is_returned();
+    }
+
+    // </editor-fold>
+
+    // <editor-fold name="Is Valid">
+
+    TEST_CASE("It should return the path is not valid if value is empty")
+    {
+        test t;
+
+        t.given_an_empty_path_value();
+        t.given_a_path();
+
+        t.when_is_valid_of_path_is_invoked();
+
+        t.then_false_is_returned();
+    }
+
+    TEST_CASE("It should return the path is not valid if value has double separator")
+    {
+        test t;
+
+        t.given_an_path_value_with_a_double_separator();
+        t.given_a_path();
+
+        t.when_is_valid_of_path_is_invoked();
+
+        t.then_false_is_returned();
+    }
+
+    TEST_CASE("It should return the path is valid if value is absolute")
+    {
+        test t;
+
+        t.given_an_absolute_path_value();
+        t.given_a_path();
+
+        t.when_is_valid_of_path_is_invoked();
+
+        t.then_true_is_returned();
+    }
+
+    TEST_CASE("It should return the path is valid if value is relative")
+    {
+        test t;
+
+        t.given_a_relative_path_value();
+        t.given_a_path();
+
+        t.when_is_valid_of_path_is_invoked();
+
+        t.then_true_is_returned();
+    }
+
+    TEST_CASE("It should return the path is valid if value is the root")
+    {
+        test t;
+
+        t.given_the_root_path_value();
+        t.given_a_path();
+
+        t.when_is_valid_of_path_is_invoked();
+
+        t.then_true_is_returned();
+    }
+
+    // </editor-fold>
 
     // <editor-fold name="Append">
 
