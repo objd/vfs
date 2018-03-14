@@ -1,5 +1,6 @@
 #include <catch/catch.hpp>
 #include <vfs/path.hpp>
+#include "../../src/unix/unix-path.hpp"
 
 namespace
 {
@@ -12,13 +13,13 @@ namespace
         std::string _value;
         std::string _other_value;
 
-        vfs::path _path;
-        vfs::path _other_path;
+        vfs::_unix::unix_path _path;
+        vfs::_unix::unix_path _other_path;
 
         bool _bool_result;
-        vfs::path _path_result;
-        vfs::path *_path_ptr_result;
         std::string *_str_ptr_result;
+        vfs::_unix::unix_path _path_result;
+        vfs::_unix::unix_path *_path_ptr_result;
 
         // </editor-fold>
 
@@ -78,12 +79,12 @@ namespace
 
         void given_a_path()
         {
-            _path = vfs::path {_value};
+            _path = vfs::_unix::unix_path {_value};
         }
 
         void given_an_other_path()
         {
-            _other_path = vfs::path {_other_value};
+            _other_path = vfs::_unix::unix_path {_other_value};
         }
 
         // </editor-fold>
@@ -193,7 +194,7 @@ namespace
 
         void then_the_returned_path_is_the_parent_of_path()
         {
-            auto separator_index = _value.rfind(vfs::paths::separator_c());
+            auto separator_index = _value.rfind(vfs::_unix::separator_c());
             std::string expected = _value.substr(0, separator_index);
 
             REQUIRE (expected == _path_result.str());
