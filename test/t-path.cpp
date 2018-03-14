@@ -1,5 +1,3 @@
-#define CATCH_CONFIG_MAIN
-
 #include <catch/catch.hpp>
 #include <vfs/path.hpp>
 
@@ -197,6 +195,13 @@ namespace
         {
             auto separator_index = _value.rfind(vfs::paths::separator_c());
             std::string expected = _value.substr(0, separator_index);
+
+            REQUIRE (expected == _path_result.str());
+        }
+
+        void then_the_returned_path_is_the_root()
+        {
+            std::string expected {"/"};
 
             REQUIRE (expected == _path_result.str());
         }
@@ -466,6 +471,19 @@ namespace
 
         t.then_the_returned_path_is_not_the_path();
         t.then_the_returned_path_is_the_parent_of_path();
+    }
+
+    TEST_CASE("It should return the root path if the path is the root")
+    {
+        test t;
+
+        t.given_the_root_path_value();
+        t.given_a_path();
+
+        t.when_parent_of_path_is_invoked();
+
+        t.then_the_returned_path_is_not_the_path();
+        t.then_the_returned_path_is_the_root();
     }
 
     // </editor-fold>

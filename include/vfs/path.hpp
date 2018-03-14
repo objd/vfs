@@ -214,51 +214,61 @@ namespace vfs
 //            }
 //        }
 
-        path &&parent() noexcept
+        path parent() noexcept
         {
-            if (is_root())
-            {
-                return clone();
-            }
-
             path parent {_value};
-            std::string &parent_val = parent._value;
 
-            if (has_trailing_separator())
+            if (is_not_root())
             {
-                parent_val.erase(parent_val.end() - 1);
+                std::string &parent_val = parent._value;
+
+                if (has_trailing_separator())
+                {
+                    parent_val.erase(parent_val.end() - 1);
+                }
+
+                auto last_separator_ix = parent_val.rfind(vfs::paths::separator_c());
+
+                if (last_separator_ix != std::string::npos)
+                {
+                    parent_val.erase(last_separator_ix);
+                }
+                else
+                {
+                    parent.prepend("..");
+                }
             }
 
-            auto index = parent_val.rfind(vfs::paths::separator_c());
-            parent_val.erase(index);
-
-            return std::move(parent);
+            return parent;
         }
 
         inline path &&filename() noexcept
         {
-            if (is_root())
-            {
-                return clone();
-            }
-
             path filename {_value};
-            std::string &filename_val = filename._value;
 
-            if (has_trailing_separator())
+            if (is_not_root())
             {
-                filename_val.erase(filename_val.end() - 1);
-            }
+                std::string &filename_val = filename._value;
 
-            auto index = filename_val.rfind(vfs::paths::separator_c());
-            filename_val.erase(0, index);
+                if (has_trailing_separator())
+                {
+                    filename_val.erase(filename_val.end() - 1);
+                }
+
+                auto last_separator_ix = filename_val.rfind(vfs::paths::separator_c());
+
+                if (last_separator_ix != std::string::npos)
+                {
+                    filename_val.erase(0, last_separator_ix);
+                }
+            }
 
             return std::move(filename);
         }
 
-        inline path &&clone() const noexcept
+        inline path clone() const noexcept
         {
-            return std::move(path {*this});
+            return path {*this};
         }
 
         inline const std::string &str() const noexcept
@@ -286,6 +296,11 @@ namespace vfs
         inline bool is_root()
         {
             return _value == vfs::paths::separator();
+        }
+
+        inline bool is_not_root()
+        {
+            return _value != vfs::paths::separator();
         }
     };
 }

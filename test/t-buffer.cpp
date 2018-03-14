@@ -1,5 +1,3 @@
-#define CATCH_CONFIG_MAIN
-
 #include <catch/catch.hpp>
 #include <vfs/buffer.hpp>
 
@@ -56,7 +54,7 @@ namespace
 
     // <editor-fold name="Put">
 
-    TEST_CASE("It should append as-is if values are absolute", "append")
+    TEST_CASE("It should append as-is if values are absoluteaaf asfasf")
     {
         test t;
 
