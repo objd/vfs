@@ -1,0 +1,74 @@
+sudo: required
+
+branches:
+  only:
+    - master
+    - develop
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-6
+      - g++-6
+      - rpm
+      - autoconf
+      - cmake
+
+language: c++
+compiler: gcc-6
+
+services:
+  - docker
+
+env:
+  global:
+    - VERSION_MAJOR=$(date +%Y)
+    - VERSION_MINOR=$(date +%m)
+    - VERSION_PATCH=$(date +%d)
+    - VERSION_BUILD=$TRAVIS_BUILD_NUMBER
+
+before_install: &bi
+
+  # Print environment for debugging purposes
+  - printenv
+
+  # Update all libraries
+  - sudo apt-get update --yes -qq
+
+  # Install uv libraries
+  - git clone https://github.com/objd/libuv
+  - cd libuv
+  - sh autogen.sh
+  - sh configure
+  - sudo make install
+  - cd ..
+
+script:
+  # Build and package everything.
+  - cmake -Bbuild -H.
+  - cmake --build build --config Release
+  - sudo cmake --build build --config Release --target test -- --environment-overrides CTEST_OUTPUT_ON_FAILURE=1
+  - sudo cmake --build build --config Release --target package
+
+before_deploy:
+  # Set up git user name and tag this commit
+  - git config --local user.name objd.github@gmail.com
+  - git config --local user.email objd.github@gmail.com
+  - git tag "${VERSION_MAJOR}.${VERSION_MINOR}-${VERSION_BUILD}"
+
+#deploy:
+#  skip_cleanup: true
+#  provider: releases
+#  api_key:
+#    secure: oQWRjmlT1M6Bdp/4miuBtdPEBTJ9NpcotUmygCFsksFCAcwGUu2XnRn5OUAF4Hsojqgf3t+DRR/7y7ca3abYS6n5LMYFmpQxstR/X1efoUVlTV0IUJLLLyF4vmAa88QQTb8Zu/IwXzE0fUX4HBVlvQqU9onRBNCiEvB+g6hIaWrj7yVd7HnWWylNDMuMgf+g26Uy9JRUb8TjRLBeEfGmGKfm/a4Er0Iuinza6i0Aa+H3FWLhVqvZ4hMNhbvaN9AJunhToNRdovhaZBuqjTTCTgBFKodng/Ak4oOd/Y1T7h8TBxhlbCPbhW2hFKECp7TneBRlIExV68dA3FuJhpWqIXCbe87oCE24bsDFS9PfS3saOFxSMamLxrmhwJzGAtT59jVPxl7erv8gTobrH6krolrhbG3M+OYzOvUHfzO1ApwcSg8gbdW/71yFa1iMBJ2FqAFfZlVPMuN1HHgPtsHLnIErOUMkBUJgsVyCTsFJwZ9Psux/OPXqxWiHTsOVQ5vEhgrzUBN8oRPN4bgrtl6hiNc2oOPpJua6BC32jl0tSAZucCUBlFS6ZdYy2hskFz1iBUzdAT/PBX1VubJJlEWwlQaFLQ1YRInvc39stH6rKps+ksXdRSIV71sErLRX24WNguz6V6udWVs5U9SHZXYo5N6poerC5sIQOHWWbVTM+KE=
+#  file_glob: true
+#  file:
+#    - "build/**/*.deb"
+#    - "build/**/*.rpm"
+#    - "build/**/*.tar.gz"
+#  on:
+#    repo: objd/objd
+#    branch:
+#      - master
