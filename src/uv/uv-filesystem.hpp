@@ -6,14 +6,12 @@
 
 #include <vfs/path.hpp>
 #include <vfs/filesystem.hpp>
+#include "../unix/unix-path.hpp"
 
 namespace vfs
 {
     namespace uv
     {
-        using std::vector;
-        using vfs::path;
-
         inline int get_uv_error(uv_fs_t *req)
         {
             return static_cast<int>(-(req->result));
@@ -48,7 +46,8 @@ namespace vfs
 //        typedef typename uv_filesystem_i::truncate_cb    truncate_cb;
 //        typedef typename uv_filesystem_i::close_cb       close_cb;
 
-        class uv_filesystem : public filesystem<uv_stat_t, uv_file>
+        class uv_filesystem :
+            public filesystem<vfs::any_path, uv_stat_t, uv_file, vfs::buffer>
         {
         private:
             uv_loop_t *_uv_loop;
@@ -59,17 +58,17 @@ namespace vfs
             {};
 
         public:
-            int exists(vfs::path &path, exists_cb cb) noexcept override;
-            int stat(vfs::path &path, stat_cb cb) noexcept override;
-            int mkdir(vfs::path &path, int32_t mode, mkdir_cb cb) noexcept override;
-            int mkdirs(vfs::path &path, int32_t mode, mkdirs_cb cb) noexcept override;
-            int create(vfs::path &path, int32_t mode, create_cb cb) noexcept override;
-            int move(vfs::path &path, vfs::path &move_path, move_cb cb) noexcept override;
-            int copy(vfs::path &path, vfs::path &copy_path, copy_cb cb) noexcept override;
-            int link(vfs::path &path, vfs::path &other_path, link_cb cb) noexcept override;
-            int symlink(vfs::path &path, vfs::path &other_path, symlink_cb cb) noexcept override;
-            int unlink(vfs::path &path, unlink_cb cb) noexcept override;
-            int open(vfs::path &path, int32_t mode, int32_t flags, open_cb cb) noexcept override;
+            int exists(vfs::any_path &path, exists_cb cb) noexcept override;
+            int stat(vfs::any_path &path, stat_cb cb) noexcept override;
+            int mkdir(vfs::any_path &path, int32_t mode, mkdir_cb cb) noexcept override;
+            int mkdirs(vfs::any_path &path, int32_t mode, mkdirs_cb cb) noexcept override;
+            int create(vfs::any_path &path, int32_t mode, create_cb cb) noexcept override;
+            int move(vfs::any_path &path, vfs::any_path &move_path, move_cb cb) noexcept override;
+            int copy(vfs::any_path &path, vfs::any_path &copy_path, copy_cb cb) noexcept override;
+            int link(vfs::any_path &path, vfs::any_path &other_path, link_cb cb) noexcept override;
+            int symlink(vfs::any_path &path, vfs::any_path &other_path, symlink_cb cb) noexcept override;
+            int unlink(vfs::any_path &path, unlink_cb cb) noexcept override;
+            int open(vfs::any_path &path, int32_t mode, int32_t flags, open_cb cb) noexcept override;
             int stat(uv_file &file, fstat_cb cb) noexcept override;
             int read(uv_file &file, vfs::buffer &buf, off64_t off, read_cb cb) noexcept override;
             int write(uv_file &file, vfs::buffer &buf, off64_t off, write_cb cb) noexcept override;
@@ -124,11 +123,11 @@ namespace vfs
 //
 //        struct exists_cb_data
 //        {
-//            vfs::path &p;
+//            vfs::any_path &p;
 //            exists_cb cb;
 //        };
 //
-//        int exists(vfs::path &path, exists_cb cb) noexcept noexcept override
+//        int exists(vfs::any_path &path, exists_cb cb) noexcept noexcept override
 //        {
 //            uv_fs_t *r = new uv_fs_t{
 //                .data = new exists_cb_data{
@@ -170,11 +169,11 @@ namespace vfs
 //
 //        struct stat_cb_data
 //        {
-//            vfs::path p;
+//            vfs::any_path p;
 //            stat_cb cb;
 //        };
 //
-//        int stat(vfs::path &path, stat_cb cb) noexcept noexcept override
+//        int stat(vfs::any_path &path, stat_cb cb) noexcept noexcept override
 //        {
 //            uv_fs_t *r = new uv_fs_t{
 //                .data = new stat_cb_data{
@@ -207,11 +206,11 @@ namespace vfs
 //
 //        struct mkdir_cb_data
 //        {
-//            vfs::path p;
+//            vfs::any_path p;
 //            mkdir_cb cb;
 //        };
 //
-//        int mkdir(vfs::path &path, mode_t mode, mkdir_cb cb) noexcept noexcept override
+//        int mkdir(vfs::any_path &path, mode_t mode, mkdir_cb cb) noexcept noexcept override
 //        {
 //            uv_fs_t *r = new uv_fs_t{
 //                .data = new mkdir_cb_data{.p = path, .cb = cb}
@@ -242,15 +241,15 @@ namespace vfs
 //        struct mkdirs_cb_data
 //        {
 //            uv_filesystem &self;
-//            vfs::path p;
-//            vfs::path prev_p;
+//            vfs::any_path p;
+//            vfs::any_path prev_p;
 //            mode_t mode;
 //            mkdirs_cb cb;
 //            bool is_root;
 //            uv_fs_cb uv_fs_mkdir_cb;
 //        };
 //
-//        int mkdirs(vfs::path &path, mode_t mode, mkdirs_cb cb) noexcept noexcept override
+//        int mkdirs(vfs::any_path &path, mode_t mode, mkdirs_cb cb) noexcept noexcept override
 //        {
 //            uv_fs_t *r = new uv_fs_t{
 //                .data = new mkdirs_cb_data{
@@ -414,12 +413,12 @@ namespace vfs
 //
 ////            mkdirs_cb_data *data = new mkdirs_cb_data {.p = path, .mode = mode, .cb = cb};
 ////
-////            mkdirs_cb recursive_cb = [this, data](objd::fs::vfs::path &p, int err)
+////            mkdirs_cb recursive_cb = [this, data](objd::fs::vfs::any_path &p, int err)
 ////            {
 ////                if (err == ENOENT)
 ////                {
-////                    objd::fs::vfs::path parent = p.parent();
-////                    mkdirs(parent, data->mode, [this, data](objd::fs::vfs::path &p2, int err2)
+////                    objd::fs::vfs::any_path parent = p.parent();
+////                    mkdirs(parent, data->mode, [this, data](objd::fs::vfs::any_path &p2, int err2)
 ////                    {
 ////                        mkdir(data->p, data->mode, data->cb);
 ////                        delete data;
@@ -441,11 +440,11 @@ namespace vfs
 //        struct create_cb_data
 //        {
 //            uv_filesystem &self;
-//            vfs::path p;
+//            vfs::any_path p;
 //            create_cb cb;
 //        };
 //
-//        int create(vfs::path &path, mode_t mode, create_cb cb) noexcept noexcept override
+//        int create(vfs::any_path &path, mode_t mode, create_cb cb) noexcept noexcept override
 //        {
 //            uv_fs_t *r = new uv_fs_t{
 //                .data = new create_cb_data{.self = *this, .p = path, .cb = cb}
@@ -484,11 +483,11 @@ namespace vfs
 //
 //        struct open_cb_data
 //        {
-//            vfs::path p;
+//            vfs::any_path p;
 //            open_cb cb;
 //        };
 //
-//        int open(vfs::path &path, mode_t mode, int flags, open_cb cb) noexcept noexcept override
+//        int open(vfs::any_path &path, mode_t mode, int flags, open_cb cb) noexcept noexcept override
 //        {
 //            uv_fs_t *r = new uv_fs_t{
 //                .data = new open_cb_data{.p = path, .cb = cb}
