@@ -41,9 +41,9 @@ namespace vfs
             {};
 
             int exists(vfs::any_path &&path, exists_cb cb) noexcept override;
-            int stat(vfs::any_path &path, stat_cb cb) noexcept override;
+            int stat(vfs::any_path &&path, stat_cb cb) noexcept override;
             int mkdir(vfs::any_path &&path, int32_t mode, mkdir_cb cb) noexcept override;
-            int mkdirs(vfs::any_path &path, int32_t mode, mkdirs_cb cb) noexcept override;
+            int mkdirs(vfs::any_path &&path, int32_t mode, mkdirs_cb cb) noexcept override;
             int create(vfs::any_path &path, int32_t mode, create_cb cb) noexcept override;
             int move(vfs::any_path &path, vfs::any_path &move_path, move_cb cb) noexcept override;
             int copy(vfs::any_path &path, vfs::any_path &copy_path, copy_cb cb) noexcept override;

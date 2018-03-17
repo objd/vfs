@@ -84,7 +84,7 @@ struct stat_cb_data
     stat_cb cb;
 };
 
-int vfs::uv::uv_filesystem::stat(vfs::any_path &path, stat_cb cb) noexcept
+int vfs::uv::uv_filesystem::stat(vfs::any_path &&path, stat_cb cb) noexcept
 {
     auto d = new stat_cb_data {
         .p = path,
@@ -112,7 +112,7 @@ int vfs::uv::uv_filesystem::stat(vfs::any_path &path, stat_cb cb) noexcept
         delete req;
     });
 
-    if (result)
+    if (result != 0)
     {
         delete d;
         delete r;
@@ -174,7 +174,7 @@ int vfs::uv::uv_filesystem::mkdir(vfs::any_path &&path, int32_t mode, mkdir_cb c
 
 // <editor-fold desc="mkdirs">
 
-int vfs::uv::uv_filesystem::mkdirs(vfs::any_path &path, int32_t mode, mkdirs_cb cb) noexcept
+int vfs::uv::uv_filesystem::mkdirs(vfs::any_path &&path, int32_t mode, mkdirs_cb cb) noexcept
 {
     (void) mode;
     (void) cb;
