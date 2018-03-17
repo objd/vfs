@@ -192,11 +192,6 @@ namespace vfs
             return _value;
         }
 
-        inline const char *const c_str() const noexcept override
-        {
-            return _value.c_str();
-        }
-
         static inline constexpr const char separator_c()
         {
             return '/';

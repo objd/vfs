@@ -31,14 +31,14 @@ namespace vfs
         class uv_filesystem :
             public filesystem<vfs::any_path, uv_stat_t, uv_file, vfs::buffer>
         {
-        private:
+
+          private:
             uv_loop_t *_uv_loop;
 
-        public:
+          public:
             explicit uv_filesystem(uv_loop_t *uv_loop) : _uv_loop(uv_loop)
             {};
 
-        public:
             int exists(vfs::any_path &path, exists_cb cb) noexcept override;
             int stat(vfs::any_path &path, stat_cb cb) noexcept override;
             int mkdir(vfs::any_path &&path, int32_t mode, mkdir_cb cb) noexcept override;
@@ -49,12 +49,13 @@ namespace vfs
             int link(vfs::any_path &path, vfs::any_path &other_path, link_cb cb) noexcept override;
             int symlink(vfs::any_path &path, vfs::any_path &other_path, symlink_cb cb) noexcept override;
             int unlink(vfs::any_path &path, unlink_cb cb) noexcept override;
-            int open(vfs::any_path &path, int32_t mode, int32_t flags, open_cb cb) noexcept override;
+            int open(vfs::any_path &&path, int32_t mode, int32_t flags, open_cb cb) noexcept override;
             int stat(uv_file &file, fstat_cb cb) noexcept override;
             int read(uv_file &file, vfs::buffer &&buf, off64_t off, read_cb cb) noexcept override;
             int write(uv_file &file, vfs::buffer &&buf, off64_t off, write_cb cb) noexcept override;
             int truncate(uv_file &file, uint64_t size, off64_t off, truncate_cb cb) noexcept override;
             int close(uv_file &file, close_cb cb) noexcept override;
+
         };
     }
 }
