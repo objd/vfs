@@ -1,7 +1,7 @@
 #include <catch/catch.hpp>
 
-#include "vfs/unix/unix-path.hpp"
-#include "../t-tags.hpp"
+#include <vfs/unix/unix-path.hpp>
+#include "../include/t-tags.hpp"
 
 namespace
 {

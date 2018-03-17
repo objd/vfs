@@ -299,11 +299,51 @@ int vfs::uv::uv_filesystem::move(vfs::any_path &&path, vfs::any_path &&move_path
 
 // <editor-fold desc="copy">
 
-int vfs::uv::uv_filesystem::copy(vfs::any_path &path, vfs::any_path &copy_path, copy_cb cb) noexcept
+struct copy_cb_data
 {
-    (void) cb;
+    vfs::any_path p;
+    vfs::any_path copy_p;
+    copy_cb cb;
+};
 
-    return -1;
+int vfs::uv::uv_filesystem::copy(vfs::any_path &&path, vfs::any_path &&copy_path, copy_cb cb) noexcept
+{
+    auto d = new copy_cb_data {
+        .p = path,
+        .copy_p = copy_path,
+        .cb = cb
+    };
+
+    auto r = new uv_fs_t {.data = d};
+
+    auto result = uv_fs_copyfile(_uv_loop, r, path.str().c_str(), copy_path.str().c_str(), 0, [](uv_fs_t *req)
+    {
+        uv_fs_req_cleanup(req);
+
+        auto data = get_uv_data<copy_cb_data>(req);
+
+        if (req->result < 0)
+        {
+            auto err = get_uv_error(req);
+
+            data->cb(data->p, data->copy_p, err);
+        }
+        else
+        {
+            data->cb(data->p, data->copy_p, 0);
+        }
+
+        delete data;
+        delete req;
+    });
+
+    if (result != 0)
+    {
+        delete d;
+        delete r;
+    }
+
+    return result;
 }
 
 // </editor-fold>
@@ -313,21 +353,21 @@ int vfs::uv::uv_filesystem::copy(vfs::any_path &path, vfs::any_path &copy_path, 
 struct link_cb_data
 {
     vfs::any_path p;
-    vfs::any_path other_p;
+    vfs::any_path link_p;
     link_cb cb;
 };
 
-int vfs::uv::uv_filesystem::link(vfs::any_path &path, vfs::any_path &other_path, link_cb cb) noexcept
+int vfs::uv::uv_filesystem::link(vfs::any_path &&path, vfs::any_path &&link_p, link_cb cb) noexcept
 {
     auto d = new link_cb_data {
         .p = path,
-        .other_p = other_path,
+        .link_p = link_p,
         .cb = cb
     };
 
     auto r = new uv_fs_t {.data = d};
 
-    auto result = uv_fs_link(_uv_loop, r, path.str().c_str(), other_path.str().c_str(), [](uv_fs_t *req)
+    auto result = uv_fs_link(_uv_loop, r, path.str().c_str(), link_p.str().c_str(), [](uv_fs_t *req)
     {
         uv_fs_req_cleanup(req);
 
@@ -337,18 +377,18 @@ int vfs::uv::uv_filesystem::link(vfs::any_path &path, vfs::any_path &other_path,
         {
             int err = get_uv_error(req);
 
-            data->cb(data->p, data->other_p, err);
+            data->cb(data->p, data->link_p, err);
         }
         else
         {
-            data->cb(data->p, data->other_p, 0);
+            data->cb(data->p, data->link_p, 0);
         }
 
         delete data;
         delete req;
     });
 
-    if (result)
+    if (result != 0)
     {
         delete d;
         delete r;
@@ -437,11 +477,11 @@ int vfs::uv::uv_filesystem::unlink(vfs::any_path &path, unlink_cb cb) noexcept
         {
             int err = get_uv_error(req);
 
-            data->cb(data->p, data->other_p, err);
+            data->cb(data->p, data->link_p, err);
         }
         else
         {
-            data->cb(data->p, data->other_p, 0);
+            data->cb(data->p, data->link_p, 0);
         }
 
         delete data;

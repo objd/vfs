@@ -1,7 +1,7 @@
 #include <catch/catch.hpp>
 #include <vfs/buffer.hpp>
 
-#include "t-tags.hpp"
+#include "include/t-tags.hpp"
 
 namespace
 {

@@ -36,6 +36,10 @@ namespace vfs
             uv_loop_t *_uv_loop;
 
           public:
+            uv_filesystem()
+                : _uv_loop(nullptr)
+            {};
+
             explicit uv_filesystem(uv_loop_t *uv_loop)
                 : _uv_loop(uv_loop)
             {};
@@ -46,8 +50,8 @@ namespace vfs
             int mkdirs(vfs::any_path &&path, int32_t mode, mkdirs_cb cb) noexcept override;
             int create(vfs::any_path &&path, int32_t mode, create_cb cb) noexcept override;
             int move(vfs::any_path &&path, vfs::any_path &&move_path, move_cb cb) noexcept override;
-            int copy(vfs::any_path &path, vfs::any_path &copy_path, copy_cb cb) noexcept override;
-            int link(vfs::any_path &path, vfs::any_path &other_path, link_cb cb) noexcept override;
+            int copy(vfs::any_path &&path, vfs::any_path &&copy_path, copy_cb cb) noexcept override;
+            int link(vfs::any_path &&path, vfs::any_path &&other_path, link_cb cb) noexcept override;
             int symlink(vfs::any_path &path, vfs::any_path &other_path, symlink_cb cb) noexcept override;
             int unlink(vfs::any_path &path, unlink_cb cb) noexcept override;
             int open(vfs::any_path &&path, int32_t mode, int32_t flags, open_cb cb) noexcept override;

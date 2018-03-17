@@ -106,7 +106,7 @@ namespace vfs
 
       public:
 
-        template<typename t_path, typename = enable_if_base_path<t_path>, typename = disable_if_any_path<t_path>>
+        template<typename t_path/*, typename = enable_if_base_path<t_path>, typename = disable_if_any_path<t_path>*/>
         explicit any_path(t_path &path)
             : _path(path)
         {}
@@ -116,18 +116,18 @@ namespace vfs
 //            : _path(*path)
 //        {}
 
-        template<typename t_path, typename = enable_if_base_path<t_path>, typename = disable_if_any_path<t_path>>
-        any_path(t_path &&path)
-            : _path(path)
-        {}
+//        template<typename t_path, typename = enable_if_base_path<t_path>, typename = disable_if_any_path<t_path>>
+//        any_path(t_path &&path)
+//            : _path(path)
+//        {}
 
-        any_path(const any_path &lhs) noexcept
-            : _path(lhs._path)
-        {}
-
-        any_path(any_path &&rhs) noexcept
-            : _path(rhs._path)
-        {}
+//        any_path(const any_path &lhs) noexcept
+//            : _path(lhs._path)
+//        {}
+//
+//        any_path(any_path &&rhs) noexcept
+//            : _path(rhs._path)
+//        {}
 
         template<typename t_path, typename = enable_if_base_path<t_path>>
         inline any_path &operator=(const t_path &path)
