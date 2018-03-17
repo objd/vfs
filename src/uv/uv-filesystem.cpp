@@ -193,7 +193,7 @@ struct create_cb_data
     create_cb cb;
 };
 
-int vfs::uv::uv_filesystem::create(vfs::any_path &path, int32_t mode, create_cb cb) noexcept
+int vfs::uv::uv_filesystem::create(vfs::any_path &&path, int32_t mode, create_cb cb) noexcept
 {
     auto d = new create_cb_data {
         .fs = *this,
@@ -203,7 +203,7 @@ int vfs::uv::uv_filesystem::create(vfs::any_path &path, int32_t mode, create_cb 
 
     auto r = new uv_fs_t {.data =  d};
 
-    int result = uv_fs_open(_uv_loop, r, path.str().c_str(), UV_FS_O_CREAT, mode, [](uv_fs_t *req) noexcept
+    auto result = uv_fs_open(_uv_loop, r, path.str().c_str(), UV_FS_O_CREAT | UV_FS_O_EXCL, mode, [](uv_fs_t *req) noexcept
     {
         uv_fs_req_cleanup(req);
 
@@ -218,9 +218,9 @@ int vfs::uv::uv_filesystem::create(vfs::any_path &path, int32_t mode, create_cb 
             data->cb(data->p, 0);
         }
 
-        uv_file file = get_uv_file(req);
+        auto file = get_uv_file(req);
 
-        int async_result = uv_fs_close(data->fs._uv_loop, req, file, [](uv_fs_t *req)
+        auto async_result = uv_fs_close(data->fs._uv_loop, req, file, [](uv_fs_t *req)
         {
             uv_fs_req_cleanup(req);
 
@@ -228,14 +228,14 @@ int vfs::uv::uv_filesystem::create(vfs::any_path &path, int32_t mode, create_cb 
             delete req;
         });
 
-        if (async_result)
+        if (async_result != 0)
         {
             delete data;
             delete req;
         }
     });
 
-    if (result)
+    if (result != 0)
     {
         delete d;
         delete r;
@@ -255,7 +255,7 @@ struct move_cb_data
     move_cb cb;
 };
 
-int vfs::uv::uv_filesystem::move(vfs::any_path &path, vfs::any_path &move_path, move_cb cb) noexcept
+int vfs::uv::uv_filesystem::move(vfs::any_path &&path, vfs::any_path &&move_path, move_cb cb) noexcept
 {
     auto d = new move_cb_data {
         .p = path,
@@ -265,7 +265,7 @@ int vfs::uv::uv_filesystem::move(vfs::any_path &path, vfs::any_path &move_path, 
 
     auto r = new uv_fs_t {.data = d};
 
-    int result = uv_fs_rename(_uv_loop, r, path.str().c_str(), move_path.str().c_str(), [](uv_fs_t *req)
+    auto result = uv_fs_rename(_uv_loop, r, path.str().c_str(), move_path.str().c_str(), [](uv_fs_t *req)
     {
         uv_fs_req_cleanup(req);
 
@@ -273,7 +273,7 @@ int vfs::uv::uv_filesystem::move(vfs::any_path &path, vfs::any_path &move_path, 
 
         if (req->result < 0)
         {
-            int err = get_uv_error(req);
+            auto err = get_uv_error(req);
 
             data->cb(data->p, data->move_p, err);
         }
@@ -286,7 +286,7 @@ int vfs::uv::uv_filesystem::move(vfs::any_path &path, vfs::any_path &move_path, 
         delete req;
     });
 
-    if (result)
+    if (result != 0)
     {
         delete d;
         delete r;

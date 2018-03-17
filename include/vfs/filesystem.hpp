@@ -63,8 +63,8 @@ namespace vfs
         virtual int stat(t_path &&path, stat_cb cb) noexcept = 0;
         virtual int mkdir(t_path &&path, int32_t mode, mkdir_cb cb) noexcept = 0;
         virtual int mkdirs(t_path &&path, int32_t mode, mkdirs_cb cb) noexcept = 0;
-        virtual int create(t_path &path, int32_t mode, create_cb cb) noexcept = 0;
-        virtual int move(t_path &path, t_path &move_path, move_cb cb) noexcept = 0;
+        virtual int create(t_path &&path, int32_t mode, create_cb cb) noexcept = 0;
+        virtual int move(t_path &&path, t_path &&move_path, move_cb cb) noexcept = 0;
         virtual int copy(t_path &path, t_path &copy_path, copy_cb cb) noexcept = 0;
         virtual int link(t_path &path, t_path &other_path, link_cb cb) noexcept = 0;
         virtual int symlink(t_path &path, t_path &other_path, symlink_cb cb) noexcept = 0;
