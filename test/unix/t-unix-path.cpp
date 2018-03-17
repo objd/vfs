@@ -1,29 +1,30 @@
 #include <catch/catch.hpp>
-#include <vfs/path.hpp>
-#include "../../src/unix/unix-path.hpp"
+
+#include "vfs/unix/unix-path.hpp"
+#include "../t-tags.hpp"
 
 namespace
 {
-    class test // NOLINT
+    class test
     {
-    private:
+      private:
 
         // <editor-fold name="Context">
 
         std::string _value;
         std::string _other_value;
 
-        vfs::_unix::unix_path _path;
-        vfs::_unix::unix_path _other_path;
+        vfs::unix_path _path;
+        vfs::unix_path _other_path;
 
         bool _bool_result;
         std::string *_str_ptr_result;
-        vfs::_unix::unix_path _path_result;
-        vfs::_unix::unix_path *_path_ptr_result;
+        vfs::unix_path _path_result;
+        vfs::unix_path *_path_ptr_result;
 
         // </editor-fold>
 
-    public:
+      public:
 
         // <editor-fold name="Given">
 
@@ -79,12 +80,12 @@ namespace
 
         void given_a_path()
         {
-            _path = vfs::_unix::unix_path {_value};
+            _path = vfs::unix_path {_value};
         }
 
         void given_an_other_path()
         {
-            _other_path = vfs::_unix::unix_path {_other_value};
+            _other_path = vfs::unix_path {_other_value};
         }
 
         // </editor-fold>
@@ -143,11 +144,6 @@ namespace
             REQUIRE (&_path == _path_ptr_result);
         }
 
-        void then_the_returned_path_is_not_the_path()
-        {
-            REQUIRE (&_path != _path_ptr_result);
-        }
-
         void then_the_returned_path_has_appended_the_value_and_the_other_value()
         {
             std::string expected = _value.append(_other_value);
@@ -194,7 +190,7 @@ namespace
 
         void then_the_returned_path_is_the_parent_of_path()
         {
-            auto separator_index = _value.rfind(vfs::_unix::separator_c());
+            auto separator_index = _value.rfind("/");
             std::string expected = _value.substr(0, separator_index);
 
             REQUIRE (expected == _path_result.str());
@@ -210,10 +206,9 @@ namespace
         // </editor-fold>
     };
 
-
     // <editor-fold name="Is Absolute">
 
-    TEST_CASE("It should return the path is absolute if value is absolute")
+    TEST_CASE("It should return the path is absolute if value is absolute", UNIT_TEST_TAG)
     {
         test t;
 
@@ -225,7 +220,7 @@ namespace
         t.then_true_is_returned();
     }
 
-    TEST_CASE("It should return the path is absolute if value is root")
+    TEST_CASE("It should return the path is absolute if value is root", UNIT_TEST_TAG)
     {
         test t;
 
@@ -237,7 +232,7 @@ namespace
         t.then_true_is_returned();
     }
 
-    TEST_CASE("It should return the path is not absolute if value is relative")
+    TEST_CASE("It should return the path is not absolute if value is relative", UNIT_TEST_TAG)
     {
         test t;
 
@@ -253,7 +248,7 @@ namespace
 
     // <editor-fold name="Is Relative">
 
-    TEST_CASE("It should return the path is relative if value is relative")
+    TEST_CASE("It should return the path is relative if value is relative", UNIT_TEST_TAG)
     {
         test t;
 
@@ -265,7 +260,7 @@ namespace
         t.then_true_is_returned();
     }
 
-    TEST_CASE("It should return the path is not relative if value is root")
+    TEST_CASE("It should return the path is not relative if value is root", UNIT_TEST_TAG)
     {
         test t;
 
@@ -277,7 +272,7 @@ namespace
         t.then_false_is_returned();
     }
 
-    TEST_CASE("It should return the path is not relative if value is absolute")
+    TEST_CASE("It should return the path is not relative if value is absolute", UNIT_TEST_TAG)
     {
         test t;
 
@@ -293,7 +288,7 @@ namespace
 
     // <editor-fold name="Is Valid">
 
-    TEST_CASE("It should return the path is not valid if value is empty")
+    TEST_CASE("It should return the path is not valid if value is empty", UNIT_TEST_TAG)
     {
         test t;
 
@@ -305,7 +300,7 @@ namespace
         t.then_false_is_returned();
     }
 
-    TEST_CASE("It should return the path is not valid if value has double separator")
+    TEST_CASE("It should return the path is not valid if value has double separator", UNIT_TEST_TAG)
     {
         test t;
 
@@ -317,7 +312,7 @@ namespace
         t.then_false_is_returned();
     }
 
-    TEST_CASE("It should return the path is valid if value is absolute")
+    TEST_CASE("It should return the path is valid if value is absolute", UNIT_TEST_TAG)
     {
         test t;
 
@@ -329,7 +324,7 @@ namespace
         t.then_true_is_returned();
     }
 
-    TEST_CASE("It should return the path is valid if value is relative")
+    TEST_CASE("It should return the path is valid if value is relative", UNIT_TEST_TAG)
     {
         test t;
 
@@ -341,7 +336,7 @@ namespace
         t.then_true_is_returned();
     }
 
-    TEST_CASE("It should return the path is valid if value is the root")
+    TEST_CASE("It should return the path is valid if value is the root", UNIT_TEST_TAG)
     {
         test t;
 
@@ -357,7 +352,7 @@ namespace
 
     // <editor-fold name="Append">
 
-    TEST_CASE("It should append as-is if values are absolute")
+    TEST_CASE("It should append as-is if values are absolute", UNIT_TEST_TAG)
     {
         test t;
 
@@ -373,7 +368,7 @@ namespace
         t.then_the_returned_path_has_appended_the_value_and_the_other_value();
     }
 
-    TEST_CASE("It should trim value if value ends with separator and other value is absolute")
+    TEST_CASE("It should trim value if value ends with separator and other value is absolute", UNIT_TEST_TAG)
     {
         test t;
 
@@ -389,7 +384,7 @@ namespace
         t.then_the_returned_path_has_appended_the_trimmed_value_and_the_other_value();
     }
 
-    TEST_CASE("It should add a separator if value does not end with separator and other value is relative")
+    TEST_CASE("It should add a separator if value does not end with separator and other value is relative", UNIT_TEST_TAG)
     {
         test t;
 
@@ -409,7 +404,7 @@ namespace
 
     // <editor-fold name="Prepend">
 
-    TEST_CASE("It should prepend as-is if values are absolute")
+    TEST_CASE("It should prepend as-is if values are absolute", UNIT_TEST_TAG)
     {
         test t;
 
@@ -425,7 +420,7 @@ namespace
         t.then_the_returned_path_has_prepended_the_value_and_the_other_value();
     }
 
-    TEST_CASE("It should trim value if other value ends with separator and value is absolute")
+    TEST_CASE("It should trim value if other value ends with separator and value is absolute", UNIT_TEST_TAG)
     {
         test t;
 
@@ -441,7 +436,7 @@ namespace
         t.then_the_returned_path_has_prepended_the_value_and_the_other_trimmed_value();
     }
 
-    TEST_CASE("It should add a separator if other value does not end with separator and value is relative")
+    TEST_CASE("It should add a separator if other value does not end with separator and value is relative", UNIT_TEST_TAG)
     {
         test t;
 
@@ -461,7 +456,7 @@ namespace
 
     // <editor-fold name="Parent">
 
-    TEST_CASE("It should return the parent path if the path is absolute")
+    TEST_CASE("It should return the parent path if the path is absolute", UNIT_TEST_TAG)
     {
         test t;
 
@@ -470,11 +465,10 @@ namespace
 
         t.when_parent_of_path_is_invoked();
 
-        t.then_the_returned_path_is_not_the_path();
         t.then_the_returned_path_is_the_parent_of_path();
     }
 
-    TEST_CASE("It should return the root path if the path is the root")
+    TEST_CASE("It should return the root path if the path is the root", UNIT_TEST_TAG)
     {
         test t;
 
@@ -483,7 +477,6 @@ namespace
 
         t.when_parent_of_path_is_invoked();
 
-        t.then_the_returned_path_is_not_the_path();
         t.then_the_returned_path_is_the_root();
     }
 

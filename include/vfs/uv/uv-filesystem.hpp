@@ -6,7 +6,7 @@
 
 #include <vfs/path.hpp>
 #include <vfs/filesystem.hpp>
-#include "../unix/unix-path.hpp"
+#include "vfs/unix/unix-path.hpp"
 
 namespace vfs
 {
@@ -70,8 +70,8 @@ namespace vfs
             int unlink(vfs::any_path &path, unlink_cb cb) noexcept override;
             int open(vfs::any_path &path, int32_t mode, int32_t flags, open_cb cb) noexcept override;
             int stat(uv_file &file, fstat_cb cb) noexcept override;
-            int read(uv_file &file, vfs::buffer &buf, off64_t off, read_cb cb) noexcept override;
-            int write(uv_file &file, vfs::buffer &buf, off64_t off, write_cb cb) noexcept override;
+            int read(uv_file &file, vfs::buffer &&buf, off64_t off, read_cb cb) noexcept override;
+            int write(uv_file &file, vfs::buffer &&buf, off64_t off, write_cb cb) noexcept override;
             int truncate(uv_file &file, uint64_t size, off64_t off, truncate_cb cb) noexcept override;
             int close(uv_file &file, close_cb cb) noexcept override;
         };

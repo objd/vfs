@@ -7,27 +7,30 @@
 
 namespace vfs
 {
+    template<typename t_mem>
+    using enable_if_not_pointer = std::enable_if<!std::is_pointer<t_mem>::value>;
+
     class buffer
     {
-    private:
+      private:
         uint64_t _size;
         uint64_t _capacity;
-        std::unique_ptr<uint8_t> _ptr;
+        std::unique_ptr<uint8_t[]> _ptr;
 
-    public:
+      public:
         explicit buffer()
-            : _ptr(std::unique_ptr<uint8_t>{nullptr}), _size(0), _capacity(0)
+            : _ptr(std::unique_ptr<uint8_t[]>{nullptr}), _size(0), _capacity(0)
         {}
 
         explicit buffer(uint64_t capacity)
-            : _ptr(std::make_unique<uint8_t>(capacity)), _size(0), _capacity(capacity)
+            : _ptr(std::make_unique<uint8_t[]>(capacity)), _size(0), _capacity(capacity)
         {}
 
-        explicit buffer(std::unique_ptr<uint8_t> &&ptr, uint64_t capacity)
+        explicit buffer(std::unique_ptr<uint8_t[]> &&ptr, uint64_t capacity)
             : _ptr(std::move(ptr)), _size(0), _capacity(capacity)
         {}
 
-        explicit buffer(std::unique_ptr<uint8_t> &&ptr, uint64_t size, uint64_t capacity)
+        explicit buffer(std::unique_ptr<uint8_t[]> &&ptr, uint64_t size, uint64_t capacity)
             : _ptr(std::move(ptr)), _size(size), _capacity(capacity)
         {}
 
@@ -61,7 +64,8 @@ namespace vfs
         template<typename t_data>
         t_data *data()
         {
-            return reinterpret_cast<t_data *>(_ptr.get());
+            auto *ptr = static_cast<void *>(_ptr.get());
+            return static_cast<t_data *>(ptr);
         }
 
         uint8_t *data()
@@ -79,14 +83,20 @@ namespace vfs
             return _ptr.get() + _size;
         }
 
-        bool put(void *mem, uint64_t size)
+        template<typename t_mem, typename enable_if_not_pointer<t_mem>::type * = nullptr>
+        bool put(const t_mem &mem)
+        {
+            return put(mem, sizeof(mem));
+        }
+
+        bool put(const void *mem, uint64_t size)
         {
             if (_size + size >= _capacity)
             {
                 return false;
             }
 
-            memcpy(_ptr.get() + _size, mem, size);
+            std::memcpy(_ptr.get() + _size, mem, size);
 
             _size += size;
 
@@ -103,11 +113,6 @@ namespace vfs
             _size = size;
         }
     };
-
-    inline buffer &&create()
-    {
-
-    }
 }
 
 #endif

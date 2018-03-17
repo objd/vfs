@@ -1,11 +1,13 @@
 #include <catch/catch.hpp>
 #include <vfs/buffer.hpp>
 
+#include "t-tags.hpp"
+
 namespace
 {
     class test // NOLINT
     {
-    private:
+      private:
 
         // <editor-fold name="Context">
 
@@ -17,7 +19,7 @@ namespace
 
         // </editor-fold>
 
-    public:
+      public:
 
         // <editor-fold name="Given">
 
@@ -54,7 +56,7 @@ namespace
 
     // <editor-fold name="Put">
 
-    TEST_CASE("It should append as-is if values are absoluteaaf asfasf")
+    TEST_CASE("It should append as-is if values are absoluteaaf asfasf", UNIT_TEST_TAG)
     {
         test t;
 

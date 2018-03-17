@@ -3,7 +3,7 @@
 #include <vfs/path.hpp>
 #include <vfs/filesystem.hpp>
 
-#include "uv-filesystem.hpp"
+#include "vfs/uv/uv-filesystem.hpp"
 
 // <editor-fold desc="using">
 
@@ -558,7 +558,7 @@ struct read_cb_data
     read_cb cb;
 };
 
-int vfs::uv::uv_filesystem::read(uv_file &file, vfs::buffer &buf, off64_t off, read_cb cb) noexcept
+int vfs::uv::uv_filesystem::read(uv_file &file, vfs::buffer &&buf, off64_t off, read_cb cb) noexcept
 {
     auto d = new read_cb_data {
         .buf = std::move(buf),
@@ -610,14 +610,55 @@ int vfs::uv::uv_filesystem::read(uv_file &file, vfs::buffer &buf, off64_t off, r
 
 struct write_cb_data
 {
+    vfs::buffer buf;
     uv_file f;
-    vfs::buffer &buf;
     write_cb cb;
 };
 
-int vfs::uv::uv_filesystem::write(uv_file &file, vfs::buffer &buf, off64_t off, write_cb cb) noexcept
+int vfs::uv::uv_filesystem::write(uv_file &file, vfs::buffer &&buf, off64_t off, write_cb cb) noexcept
 {
-    return 0;
+    auto d = new write_cb_data {
+        .buf = std::move(buf),
+        .f = file,
+        .cb = cb
+    };
+
+    auto r = new uv_fs_t {.data = d};
+
+    uv_buf_t bufs[] = {
+        {.base = d->buf.data<char>(), .len = d->buf.size()}
+    };
+
+    auto result = uv_fs_write(_uv_loop, r, file, bufs, 1, off, [](uv_fs_t *req)
+    {
+        uv_fs_req_cleanup(req);
+
+        auto data = get_uv_data<write_cb_data>(req);
+
+        if (req->result < 0)
+        {
+            data->cb(data->f, get_uv_error(req), data->buf);
+        }
+        else
+        {
+            auto n_write = static_cast<uint64_t>(req->result);
+
+            data->buf.truncate(n_write);
+
+            data->cb(data->f, 0, data->buf);
+        }
+
+        delete data;
+        delete req;
+    });
+
+    if (result)
+    {
+        delete d;
+        delete r;
+    }
+
+    return result;
 }
 
 // </editor-fold>
@@ -633,9 +674,47 @@ int vfs::uv::uv_filesystem::truncate(uv_file &file, uint64_t size, off64_t off, 
 
 // <editor-fold desc="close">
 
+struct close_cb_data
+{
+    uv_file f;
+    close_cb cb;
+};
+
 int vfs::uv::uv_filesystem::close(uv_file &file, close_cb cb) noexcept
 {
-    return 0;
+    auto d = new close_cb_data {
+        .f = file,
+        .cb = cb
+    };
+
+    auto r = new uv_fs_t {.data = d};
+
+    auto result = uv_fs_close(_uv_loop, r, file, [](uv_fs_t *req)
+    {
+        uv_fs_req_cleanup(req);
+
+        auto data = get_uv_data<close_cb_data>(req);
+
+        if (req->result < 0)
+        {
+            data->cb(data->f, get_uv_error(req));
+        }
+        else
+        {
+            data->cb(data->f, 0);
+        }
+
+        delete data;
+        delete req;
+    });
+
+    if (result)
+    {
+        delete d;
+        delete r;
+    }
+
+    return result;
 }
 
 // </editor-fold>
