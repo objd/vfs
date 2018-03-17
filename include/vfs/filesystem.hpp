@@ -11,24 +11,55 @@ namespace vfs
     class filesystem
     {
       public:
-        using exists_cb = std::function<void(t_path &, int, bool)>;
-        typedef std::function<void(t_path &, int, t_stat)> stat_cb;
-        typedef std::function<void(t_path &, int)> mkdir_cb;
-        typedef std::function<void(t_path &, int)> mkdirs_cb;
-        typedef std::function<void(t_path &, int)> create_cb;
-        typedef std::function<void(t_path &, t_path &, int)> move_cb;
-        typedef std::function<void(t_path &, t_path &, int)> copy_cb;
-        typedef std::function<void(t_path &, t_path &, int)> link_cb;
-        typedef std::function<void(t_path &, t_path &, int)> symlink_cb;
-        typedef std::function<void(t_path &, int)> unlink_cb;
-        typedef std::function<void(t_path &, int, t_file &)> open_cb;
-        typedef std::function<void(t_file &, int, t_stat)> fstat_cb;
-        typedef std::function<void(t_file &, int, vfs::buffer &)> read_cb;
-        typedef std::function<void(t_file &, int, vfs::buffer &)> write_cb;
-        typedef std::function<void(t_file &, int, uint64_t)> truncate_cb;
-        typedef std::function<void(t_file &, int)> close_cb;
+        using exists_cb = std::function<
+            void(t_path &, int, bool)>;
 
-        virtual int exists(t_path &path, exists_cb cb) noexcept = 0;
+        using stat_cb = std::function<
+            void(t_path &, int, t_stat)>;
+
+        using mkdir_cb = std::function<
+            void(t_path &, int)>;
+
+        using mkdirs_cb = std::function<
+            void(t_path &, int)>;
+
+        using create_cb = std::function<
+            void(t_path &, int)>;
+
+        using move_cb = std::function<
+            void(t_path &, t_path &, int)>;
+
+        using copy_cb = std::function<
+            void(t_path &, t_path &, int)>;
+
+        using link_cb = std::function<
+            void(t_path &, t_path &, int)>;
+
+        using symlink_cb = std::function<
+            void(t_path &, t_path &, int)>;
+
+        using unlink_cb = std::function<
+            void(t_path &, int)>;
+
+        using open_cb = std::function<
+            void(t_path &, int, t_file &)>;
+
+        using fstat_cb = std::function<
+            void(t_file &, int, t_stat)>;
+
+        using read_cb = std::function<
+            void(t_file &, int, vfs::buffer &)>;
+
+        using write_cb = std::function<
+            void(t_file &, int, vfs::buffer &)>;
+
+        using truncate_cb = std::function<
+            void(t_file &, int, uint64_t)>;
+
+        using close_cb = std::function<
+            void(t_file &, int)>;
+
+        virtual int exists(t_path &&path, exists_cb cb) noexcept = 0;
         virtual int stat(t_path &path, stat_cb cb) noexcept = 0;
         virtual int mkdir(t_path &&path, int32_t mode, mkdir_cb cb) noexcept = 0;
         virtual int mkdirs(t_path &path, int32_t mode, mkdirs_cb cb) noexcept = 0;

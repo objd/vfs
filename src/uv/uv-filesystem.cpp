@@ -30,11 +30,11 @@ using close_cb = typename vfs::uv::uv_filesystem::close_cb;
 
 struct exists_cb_data
 {
-    vfs::any_path &p;
+    vfs::any_path p;
     exists_cb cb;
 };
 
-int vfs::uv::uv_filesystem::exists(vfs::any_path &path, exists_cb cb) noexcept
+int vfs::uv::uv_filesystem::exists(vfs::any_path &&path, exists_cb cb) noexcept
 {
     auto r = new uv_fs_t {
         .data = new exists_cb_data {

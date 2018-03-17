@@ -148,7 +148,7 @@ namespace
         {
             std::string expected = _value.append(_other_value);
 
-            REQUIRE (expected == _path_result.c_str());
+            REQUIRE (expected == _path_result.str());
         }
 
         void then_the_returned_path_has_appended_the_trimmed_value_and_the_other_value()
@@ -156,14 +156,14 @@ namespace
             std::string value {_value.begin(), _value.end() - 1};
             std::string expected = value.append(_other_value);
 
-            REQUIRE (expected == _path_result.c_str());
+            REQUIRE (expected == _path_result.str());
         }
 
         void then_the_returned_path_has_appended_the_value_and_the_other_value_with_a_sep()
         {
             std::string expected = _value.append("/").append(_other_value);
 
-            REQUIRE (expected == _path_result.c_str());
+            REQUIRE (expected == _path_result.str());
         }
 
         void then_the_returned_path_has_prepended_the_value_and_the_other_value()

@@ -28,6 +28,6 @@ file(GLOB_RECURSE VFS_TEST_FILES "t-**.hpp" "t-**.cpp")
 
 add_executable(t-runner ${VFS_TEST_FILES} ${VFS_CATCH_FILES})
 set_target_properties(t-runner PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(t-runner gmock gtest)
+target_link_libraries(t-runner vfs-uv vfs-unix gmock gtest uv)
 
 add_test(NAME unit-tests COMMAND t-runner)
