@@ -131,16 +131,18 @@ struct mkdir_cb_data
     mkdir_cb cb;
 };
 
-int vfs::uv::uv_filesystem::mkdir(vfs::any_path &path, int32_t mode, mkdir_cb cb) noexcept
+int vfs::uv::uv_filesystem::mkdir(vfs::any_path &&path, int32_t mode, mkdir_cb cb) noexcept
 {
-    auto r = new uv_fs_t {
-        .data = new mkdir_cb_data {
-            .p = path,
-            .cb = cb
-        }
+    auto d = new mkdir_cb_data {
+        .p = std::move(path),
+        .cb = cb
     };
 
-    uv_fs_mkdir(_uv_loop, r, path.c_str(), mode, [](uv_fs_t *req)
+    auto r = new uv_fs_t {
+        .data = d
+    };
+
+    auto result = uv_fs_mkdir(_uv_loop, r, path.c_str(), mode, [](uv_fs_t *req)
     {
         uv_fs_req_cleanup(req);
 
@@ -159,7 +161,13 @@ int vfs::uv::uv_filesystem::mkdir(vfs::any_path &path, int32_t mode, mkdir_cb cb
         delete req;
     });
 
-    return 0;
+    if (result)
+    {
+        delete d;
+        delete r;
+    }
+
+    return result;
 }
 
 // </editor-fold>

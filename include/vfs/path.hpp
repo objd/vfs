@@ -6,68 +6,82 @@
 
 namespace vfs
 {
+    template<typename t_allocator>
     class path;
-    class any_path;
 
-    template<typename t_path>
+    template<typename t_path, typename t_allocator>
     class base_path;
 
-    template<typename t_path>
-    using is_path = std::is_base_of<path, t_path>;
+    template<typename t_allocator>
+    class any_path;
 
-    template<typename t_path>
-    using is_base_path = std::is_base_of<base_path<t_path>, t_path>;
+    template<typename t_path, typename t_allocator>
+    using is_path = std::is_base_of<path<t_allocator>, t_path>;
 
-    template<typename t_path>
-    using enable_if_path = typename std::enable_if<is_path<t_path>::value>::type;
+    template<typename t_path, typename t_allocator>
+    using is_base_path = std::is_base_of<base_path<t_path, t_allocator>, t_path>;
 
-    template<typename t_path>
-    using enable_if_base_path = typename std::enable_if<is_base_path<t_path>::value, t_path>::type;
+    template<typename t_path, typename t_allocator>
+    using enable_if_path = std::enable_if_t<is_path<t_path, t_allocator>::value>;
 
+    template<typename t_path, typename t_allocator>
+    using enable_if_base_path = std::enable_if_t<is_base_path<t_path, t_allocator>::value, t_path>;
+
+    template<typename t_allocator>
     class path
     {
       public:
+
+        using pointer = typename std::allocator_traits<t_allocator>::pointer;
+        using reference = typename std::allocator_traits<t_allocator>::value_type &;
+        using const_reference = typename std::allocator_traits<t_allocator>::value_type const &;
+
+        virtual ~path() noexcept
+        {};
+
         virtual bool is_root() const noexcept = 0;
         virtual bool is_absolute() const noexcept = 0;
         virtual bool is_relative() const noexcept = 0;
         virtual bool is_valid() const noexcept = 0;
 
+        virtual const std::string &str() const noexcept = 0;
+        virtual const char *const c_str() const noexcept = 0;
+
         virtual path &prepend(path &path) noexcept = 0;
         virtual path &prepend(std::string &str) noexcept = 0;
         virtual path &prepend(std::string &&str) noexcept = 0;
 
-        virtual path &append(path &path) noexcept = 0;
+        virtual reference append(const_reference path) noexcept = 0;
         virtual path &append(std::string &str) noexcept = 0;
         virtual path &append(std::string &&str) noexcept = 0;
 
         virtual path &parent() noexcept = 0;
         virtual path &filename() noexcept = 0;
-
-        virtual const std::string &str() const noexcept = 0;
-        virtual const char *const c_str() const noexcept = 0;
     };
 
-    template<typename t_path>
-    class base_path : public path
+    template<typename t_path, typename t_allocator = std::allocator<t_path>>
+    class base_path : public path<t_allocator>
     {
-//        static_assert(std::is_base_of<path, t_path>::value, "t_path must be of type path");
-
       public:
+//        using pointer = std::allocator_traits<t_path>::pointer;
+//        using reference = std::allocator_traits<t_path>::value_type &;
+//        using const_reference = const std::allocator_traits<t_path>::value_type &;
 
-        virtual t_path &append(t_path &path) noexcept = 0;
-        virtual t_path &prepend(t_path &path) noexcept = 0;
+        virtual typename t_path::reference append(typename t_path::const_reference path) noexcept = 0;
 
-        inline path &append(path &_path) noexcept override
-        {
-            auto &path = static_cast<t_path &>(_path);
-            return append(_path);
-        }
-
-        inline path &prepend(path &_path) noexcept override
-        {
-            auto &path = static_cast<t_path &>(_path);
-            return prepend(_path);
-        }
+//        virtual t_path &prepend(t_path &path) noexcept = 0;
+//
+//        inline path::reference append(path::const_reference _path) noexcept override
+//        {
+//            auto &path = static_cast<t_path &>(_path);
+//            return append(_path);
+//        }
+//
+//        inline path &prepend(path &_path) noexcept override
+//        {
+//            auto &path = static_cast<t_path &>(_path);
+//            return prepend(_path);
+//        }
 
         friend inline std::ostream &operator<<(std::ostream &os, base_path<t_path> &path)
         {
@@ -76,11 +90,11 @@ namespace vfs
         }
     };
 
-    class any_path :
-        public base_path<any_path>
+    template<typename t_allocator = std::allocator<any_path>>
+    class any_path final : public base_path<any_path<t_allocator>, t_allocator>
     {
       private:
-        path &_path;
+        path<t_allocator> &_path;
 
       public:
 
@@ -89,14 +103,19 @@ namespace vfs
             : _path(path)
         {}
 
-        template<typename t_path, typename = enable_if_base_path<t_path>>
+//        template<typename t_path>
+//        explicit any_path(t_path &&path)
+//            : _path(std::move(path))
+//        {}
+
+        template<typename t_path, typename = enable_if_base_path<t_path, t_allocator>>
         inline any_path &operator=(const t_path &path)
         {
             _path = path;
             return *this;
         }
 
-        template<typename t_path, typename = enable_if_base_path<t_path>>
+        template<typename t_path, typename = enable_if_base_path<t_path, t_allocator>>
         inline any_path &operator=(t_path &&path) noexcept
         {
             _path = std::move(path);
@@ -104,16 +123,10 @@ namespace vfs
         }
 
         template<typename t_path>
-        inline explicit operator t_path &() const
+        inline operator t_path &() const
         {
             return static_cast<t_path &>(_path);
         }
-
-//        template<typename t_path>
-//        inline explicit operator t_path &&() const
-//        {
-//            return std::move(_path);
-//        }
 
         inline bool is_root() const noexcept override
         {
@@ -153,7 +166,7 @@ namespace vfs
             return *this;
         };
 
-        inline any_path &append(any_path &path) noexcept override
+        inline reference append(const_reference path) noexcept override
         {
             _path.append(path._path);
             return *this;
@@ -182,6 +195,13 @@ namespace vfs
             _path.filename();
             return *this;
         };
+
+        inline any_path &&copy()
+        {
+            auto p = _path;
+            auto any_p = static_cast<any_path &>(p);
+            return std::move(any_p);
+        }
 
         inline const std::string &str() const noexcept override
         {

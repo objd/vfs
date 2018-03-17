@@ -28,24 +28,6 @@ namespace vfs
             return static_cast<t_data *>(req->data);
         }
 
-//        typedef filesystem <uv_stat_t, uv_file, std::vector<uint8_t>> uv_filesystem_i;
-//        typedef typename uv_filesystem_i::exists_cb      exists_cb;
-//        typedef typename uv_filesystem_i::stat_cb        stat_cb;
-//        typedef typename uv_filesystem_i::mkdir_cb       mkdir_cb;
-//        typedef typename uv_filesystem_i::mkdirs_cb      mkdirs_cb;
-//        typedef typename uv_filesystem_i::create_cb      create_cb;
-//        typedef typename uv_filesystem_i::move_cb        move_cb;
-//        typedef typename uv_filesystem_i::copy_cb        copy_cb;
-//        typedef typename uv_filesystem_i::link_cb        link_cb;
-//        typedef typename uv_filesystem_i::symlink_cb     symlink_cb;
-//        typedef typename uv_filesystem_i::unlink_cb      unlink_cb;
-//        typedef typename uv_filesystem_i::open_cb        open_cb;
-//        typedef typename uv_filesystem_i::fstat_cb       fstat_cb;
-//        typedef typename uv_filesystem_i::read_cb        read_cb;
-//        typedef typename uv_filesystem_i::write_cb       write_cb;
-//        typedef typename uv_filesystem_i::truncate_cb    truncate_cb;
-//        typedef typename uv_filesystem_i::close_cb       close_cb;
-
         class uv_filesystem :
             public filesystem<vfs::any_path, uv_stat_t, uv_file, vfs::buffer>
         {
@@ -53,14 +35,13 @@ namespace vfs
             uv_loop_t *_uv_loop;
 
         public:
-
             explicit uv_filesystem(uv_loop_t *uv_loop) : _uv_loop(uv_loop)
             {};
 
         public:
             int exists(vfs::any_path &path, exists_cb cb) noexcept override;
             int stat(vfs::any_path &path, stat_cb cb) noexcept override;
-            int mkdir(vfs::any_path &path, int32_t mode, mkdir_cb cb) noexcept override;
+            int mkdir(vfs::any_path &&path, int32_t mode, mkdir_cb cb) noexcept override;
             int mkdirs(vfs::any_path &path, int32_t mode, mkdirs_cb cb) noexcept override;
             int create(vfs::any_path &path, int32_t mode, create_cb cb) noexcept override;
             int move(vfs::any_path &path, vfs::any_path &move_path, move_cb cb) noexcept override;

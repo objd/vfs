@@ -24,22 +24,19 @@ namespace vfs
         std::string _value;
 
       public:
-        unix_path() : _value("")
+        unix_path() noexcept : _value("")
         {}
 
-        explicit unix_path(std::string &value) : _value(value)
+        explicit unix_path(std::string &value) noexcept : _value(value)
         {}
 
-        explicit unix_path(std::string &&value) : _value(std::move(value))
+        explicit unix_path(std::string &&value) noexcept : _value(std::move(value))
         {}
 
-        unix_path(const unix_path &lhs) : _value(lhs._value) // NOLINT
+        unix_path(const unix_path &lhs) noexcept : _value(lhs._value) // NOLINT
         {}
 
-//        unix_path(unix_path &&rhs) noexcept : _value(std::move(rhs._value))
-//        {}
-
-        inline unix_path &operator=(const unix_path &other) // NOLINT
+        inline unix_path &operator=(const unix_path &other) noexcept // NOLINT
         {
             _value = other._value;
             return *this;
@@ -48,16 +45,10 @@ namespace vfs
         inline unix_path &operator=(const any_path &other) noexcept
         {
             _value = other.str();
-            return *this; // NOLINT
+            return *this;
         }
 
-//        inline unix_path &operator=(any_path &&other) noexcept
-//        {
-//            _value = std::move(other.str());
-//            return *this; // NOLINT
-//        }
-
-        explicit inline operator any_path()
+        inline operator any_path() noexcept
         {
             return any_path {*this};
         }

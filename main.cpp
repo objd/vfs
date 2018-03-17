@@ -10,6 +10,10 @@ int main()
     vfs::unix_path p {"/data/objd/test"};
     vfs::any_path p2 {p};
 
+    vfs::any_path p3 = vfs::unix_path {"/data/objd/test"};
+
+
+
 //    vfs::unix_path p3 = static_cast<vfs::unix_path &>(p2);
 //    vfs::any_path p4 = static_cast<vfs::any_path>(p3);
 //
@@ -22,7 +26,7 @@ int main()
 //    std::cout << p3 << std::endl;
 //    std::cout << p4 << std::endl;
 
-    fs.mkdir(p2, 0775, [&fs, &p2](vfs::any_path &path, int err)
+    fs.mkdir(p2.move(), 0775, [&fs](vfs::any_path &path, int err)
     {
         std::cout << path << " created" << std::endl;
     });

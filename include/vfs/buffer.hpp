@@ -8,7 +8,7 @@
 namespace vfs
 {
     template<typename t_mem>
-    using enable_if_not_pointer = std::enable_if<!std::is_pointer<t_mem>::value>;
+    using enable_if_not_pointer = std::enable_if_t<!std::is_pointer<t_mem>::value>;
 
     class buffer
     {
@@ -83,10 +83,10 @@ namespace vfs
             return _ptr.get() + _size;
         }
 
-        template<typename t_mem, typename enable_if_not_pointer<t_mem>::type * = nullptr>
+        template<typename t_mem, enable_if_not_pointer<t_mem> * = nullptr>
         bool put(const t_mem &mem)
         {
-            return put(mem, sizeof(mem));
+            return put(&mem, sizeof(mem));
         }
 
         bool put(const void *mem, uint64_t size)
