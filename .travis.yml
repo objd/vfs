@@ -15,6 +15,8 @@ addons:
       - rpm
       - autoconf
       - cmake
+      - libuv1
+      - libuv1-dev
 
 language: cpp
 compiler: gcc
@@ -42,12 +44,12 @@ before_install: &bi
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
 
   # Install uv libraries
-  - git clone https://github.com/objd/libuv
-  - cd libuv
-  - sh autogen.sh
-  - sh configure
-  - sudo make install
-  - cd ..
+#  - git clone https://github.com/objd/libuv
+#  - cd libuv
+#  - sh autogen.sh
+#  - sh configure
+#  - sudo make install
+#  - cd ..
 
 script:
 
