@@ -47,7 +47,7 @@ before_install: &bi
   - sh autogen.sh
   - sh configure
   - sudo make install
-  - sudo echo /usr/local/lib > /etc/ld.so.conf
+  - echo /usr/local/lib | sudo tee --append /etc/ld.so.conf > /dev/null
   - sudo ldconfig
   - cd ..
 
