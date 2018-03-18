@@ -26,14 +26,14 @@ int main()
 //    std::cout << p3 << std::endl;
 //    std::cout << p4 << std::endl;
 
-    fs.mkdir(std::move(p), 0775, [&fs](vfs::any_path &path, int err)
+    fs.mkdir(p.to_any(), 0775, [&fs](vfs::any_path &path, int err)
     {
         std::cout << path << " created" << std::endl;
     });
 
     auto flags = UV_FS_O_RDWR | UV_FS_O_CREAT;
 
-    fs.open(p.append("some-obj.txt"), 0664, flags, [&fs, &p](vfs::any_path &path, int err, uv_file &file)
+    fs.open(p.append("some-obj.txt").to_any(), 0664, flags, [&fs, &p](vfs::any_path &path, int err, uv_file &file)
     {
         vfs::buffer write_buf {8192};
 

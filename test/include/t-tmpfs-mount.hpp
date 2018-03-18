@@ -28,6 +28,7 @@ namespace vfs::test
         void unmount()
         {
             try_exec("sudo umount " + _mount_path);
+            try_exec("sudo rmdir " + _mount_path);
         }
 
         int try_exec(std::string cmd)
