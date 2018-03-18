@@ -7,7 +7,7 @@ namespace vfs
 {
     namespace test
     {
-        std::string random_string(std::string::size_type length)
+        static inline std::string random_string(std::string::size_type length)
         {
             static auto &chrs = "0123456789"
                 "abcdefghijklmnopqrstuvwxyz"
@@ -30,4 +30,4 @@ namespace vfs
     }
 }
 
-#endif //VFS_T_UTILS_H
+#endif

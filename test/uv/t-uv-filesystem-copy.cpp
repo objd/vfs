@@ -6,11 +6,11 @@
 #include "../include/t-tags.hpp"
 #include "../include/t-tmpfs-mount.hpp"
 
-#define TEST_TAG "[link]"
+#define TEST_TAG "[copy]"
 
 namespace
 {
-    class t_link
+    class t_copy
     {
       private:
 
@@ -30,7 +30,7 @@ namespace
 
       public:
 
-        ~t_link()
+        ~t_copy()
         {
             uv_loop_close(_uv_loop);
             free(_uv_loop);
@@ -90,13 +90,14 @@ namespace
 
         // <editor-fold name="When">
 
-        void when_link_is_invoked()
+        void when_copy_is_invoked()
         {
-            _result = _uv_fs.link(_path.to_any(), _other_path.to_any(),
-                                  [this](vfs::any_path &path, vfs::any_path &other_path, int err)
-                                  {
-                                      _error_result = err;
-                                  });
+            _result = _uv_fs.copy(
+                _path.to_any(), _other_path.to_any(),
+                [this](vfs::any_path &path, vfs::any_path &other_path, int err)
+                {
+                    _error_result = err;
+                });
 
             uv_run(_uv_loop, UV_RUN_DEFAULT);
         }
@@ -125,7 +126,7 @@ namespace
             REQUIRE(EEXIST == _error_result);
         }
 
-        void then_path_has_been_linked()
+        void then_path_has_been_copied()
         {
             struct stat64 stat;
 
@@ -134,23 +135,19 @@ namespace
             REQUIRE(0 == err);
             REQUIRE(S_ISREG(stat.st_mode));
 
-            struct stat64 other_stat;
-
-            err = stat64(_other_path.str().c_str(), &other_stat);
+            err = stat64(_other_path.str().c_str(), &stat);
 
             REQUIRE(0 == err);
-            REQUIRE(S_ISREG(other_stat.st_mode));
-
-            REQUIRE(stat.st_ino == other_stat.st_ino);
+            REQUIRE(S_ISREG(stat.st_mode));
         }
 
         // </editor-fold>
     };
 
     // @formatter:off
-    TEST_CASE(TEST_TAG " It should link file when other path does not exist", INTEGRATION_TEST_TAG)
+    TEST_CASE(TEST_TAG " It should copy file when other path does not exist", INTEGRATION_TEST_TAG)
     {
-        t_link t;
+        t_copy t;
 
         t.given_an_uv_loop();
         t.given_an_uv_filesystem();
@@ -158,18 +155,18 @@ namespace
         t.given_an_existing_path();
         t.given_an_unexisting_other_path();
 
-        t.when_link_is_invoked();
+        t.when_copy_is_invoked();
 
         t.then_result_is_zero();
         t.then_error_result_is_zero();
 
-        t.then_path_has_been_linked();
+        t.then_path_has_been_copied();
     }
 
     // @formatter:off
-    TEST_CASE(TEST_TAG " It should return eexist when other path exist", INTEGRATION_TEST_TAG)
+    TEST_CASE(TEST_TAG " It should copy file even if other path exist", INTEGRATION_TEST_TAG)
     {
-        t_link t;
+        t_copy t;
 
         t.given_an_uv_loop();
         t.given_an_uv_filesystem();
@@ -177,16 +174,18 @@ namespace
         t.given_an_existing_path();
         t.given_an_existing_other_path();
 
-        t.when_link_is_invoked();
+        t.when_copy_is_invoked();
 
         t.then_result_is_zero();
-        t.then_error_result_is_eexist();
+        t.then_error_result_is_zero();
+
+        t.then_path_has_been_copied();
     }
 
     // @formatter:off
     TEST_CASE(TEST_TAG " It should return enoent when path does not exist", INTEGRATION_TEST_TAG)
     {
-        t_link t;
+        t_copy t;
 
         t.given_an_uv_loop();
         t.given_an_uv_filesystem();
@@ -194,7 +193,7 @@ namespace
         t.given_an_unexisting_path();
         t.given_an_unexisting_other_path();
 
-        t.when_link_is_invoked();
+        t.when_copy_is_invoked();
 
         t.then_result_is_zero();
         t.then_error_result_is_enoent();

@@ -51,9 +51,10 @@ namespace vfs
             return *this;
         }
 
-        inline operator any_path() noexcept
+        inline any_path to_any() noexcept
         {
-            return any_path {*this};
+            auto &self = *this;
+            return vfs::any_path {self};
         }
 
         inline bool is_root() const noexcept override

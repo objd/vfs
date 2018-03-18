@@ -33,7 +33,7 @@ namespace vfs
         is_base_path<t_path>::value>;
 
     template<typename t_path>
-    using is_any_path = std::is_base_of<
+    using is_any_path = std::is_same<
         any_path, std::remove_reference_t<t_path>>;
 
     template<typename t_path>
@@ -106,10 +106,10 @@ namespace vfs
 
       public:
 
-        template<typename t_path/*, typename = enable_if_base_path<t_path>, typename = disable_if_any_path<t_path>*/>
+        template<typename t_path, typename = enable_if_base_path<t_path>, typename = disable_if_any_path<t_path>>
         explicit any_path(t_path &path)
             : _path(path)
-        {}
+        { }
 
 //        template<typename t_path/*, typename = enable_if_base_path<t_path>*/>
 //        any_path(t_path *path)
@@ -121,27 +121,24 @@ namespace vfs
 //            : _path(path)
 //        {}
 
+//        template<typename t_path, typename = disable_if_any_path<t_path>>
 //        any_path(const any_path &lhs) noexcept
 //            : _path(lhs._path)
 //        {}
+
+//        template<typename t_path, typename = enable_if_base_path<t_path>>
+//        inline any_path &operator=(const t_path &path)
+//        {
+//            _path = path;
+//            return *this;
+//        }
 //
-//        any_path(any_path &&rhs) noexcept
-//            : _path(rhs._path)
-//        {}
-
-        template<typename t_path, typename = enable_if_base_path<t_path>>
-        inline any_path &operator=(const t_path &path)
-        {
-            _path = path;
-            return *this;
-        }
-
-        template<typename t_path/*, typename = enable_if_base_path<t_path>*/>
-        inline any_path &operator=(t_path &&path) noexcept
-        {
-            _path = path;
-            return *this;
-        }
+//        template<typename t_path/*, typename = enable_if_base_path<t_path>*/>
+//        inline any_path &operator=(t_path &&path) noexcept
+//        {
+//            _path = path;
+//            return *this;
+//        }
 
         template<typename t_path>
         inline operator t_path &() const

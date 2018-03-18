@@ -36,14 +36,16 @@ struct exists_cb_data
 
 int vfs::uv::uv_filesystem::exists(vfs::any_path &&path, exists_cb cb) noexcept
 {
-    auto r = new uv_fs_t {
-        .data = new exists_cb_data {
-            .p = path,
-            .cb = cb
-        }
+    auto d = new exists_cb_data {
+        .p = path,
+        .cb = cb
     };
 
-    uv_fs_stat(_uv_loop, r, path.str().c_str(), [](uv_fs_t *req)
+    auto r = new uv_fs_t {
+        .data = d
+    };
+
+    auto result = uv_fs_stat(_uv_loop, r, path.str().c_str(), [](uv_fs_t *req)
     {
         uv_fs_req_cleanup(req);
 
@@ -71,7 +73,13 @@ int vfs::uv::uv_filesystem::exists(vfs::any_path &&path, exists_cb cb) noexcept
         delete req;
     });
 
-    return 0;
+    if (result != 0)
+    {
+        delete d;
+        delete r;
+    }
+
+    return result;
 }
 
 // </editor-fold>
@@ -134,7 +142,7 @@ struct mkdir_cb_data
 int vfs::uv::uv_filesystem::mkdir(vfs::any_path &&path, int32_t mode, mkdir_cb cb) noexcept
 {
     auto d = new mkdir_cb_data {
-        .p = std::forward<vfs::any_path>(path),
+        .p = path,
         .cb = cb
     };
 
@@ -357,17 +365,17 @@ struct link_cb_data
     link_cb cb;
 };
 
-int vfs::uv::uv_filesystem::link(vfs::any_path &&path, vfs::any_path &&link_p, link_cb cb) noexcept
+int vfs::uv::uv_filesystem::link(vfs::any_path &&path, vfs::any_path &&link_path, link_cb cb) noexcept
 {
     auto d = new link_cb_data {
         .p = path,
-        .link_p = link_p,
+        .link_p = link_path,
         .cb = cb
     };
 
     auto r = new uv_fs_t {.data = d};
 
-    auto result = uv_fs_link(_uv_loop, r, path.str().c_str(), link_p.str().c_str(), [](uv_fs_t *req)
+    auto result = uv_fs_link(_uv_loop, r, path.str().c_str(), link_path.str().c_str(), [](uv_fs_t *req)
     {
         uv_fs_req_cleanup(req);
 

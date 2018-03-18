@@ -29,12 +29,17 @@ namespace vfs
 
             void unmount()
             {
-                exec_or_throw("sudo umount " + _mount_path);
+                try_exec("sudo umount " + _mount_path);
+            }
+
+            int try_exec(std::string cmd)
+            {
+                return std::system(cmd.c_str());
             }
 
             void exec_or_throw(std::string cmd)
             {
-                auto result = std::system(cmd.c_str());
+                auto result = try_exec(cmd);
 
                 if (result != 0)
                 {

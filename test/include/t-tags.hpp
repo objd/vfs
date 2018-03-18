@@ -11,12 +11,12 @@ namespace vfs
 //        constexpr const char *unit_test_tag = "[unit test]";
 //        constexpr const char *integration_test_tag = "[integration test]";
 
-        constexpr const char *unit_test_tag()
+        static inline constexpr const char *unit_test_tag()
         {
             return "[unit test]";
         };
 
-        constexpr const char *integration_test_tag()
+        static inline constexpr const char *integration_test_tag()
         {
             return "[integration test]";
         };
