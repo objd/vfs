@@ -5,17 +5,6 @@
 
 namespace vfs
 {
-//        constexpr inline const char separator_c()
-//        {
-//            return '/';
-//        }
-//
-//        inline const std::string &separator()
-//        {
-//            static const std::string s {separator_c()};
-//            return s;
-//        }
-
     class unix_path :
         public base_path<unix_path>
     {

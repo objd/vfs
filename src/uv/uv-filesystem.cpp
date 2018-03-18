@@ -123,7 +123,9 @@ int vfs::uv::uv_filesystem::stat(vfs::any_path &&path, stat_cb cb) noexcept
         }
         else
         {
-            data->cb(data->p, 0, req->statbuf);
+            uv_stat uv_stat {req->statbuf};
+
+            data->cb(data->p, 0, uv_stat);
         }
 
         delete data;
@@ -587,7 +589,9 @@ int vfs::uv::uv_filesystem::stat(uv_file &file, fstat_cb cb) noexcept
         }
         else
         {
-            data->cb(data->p, 0, req->statbuf);
+            uv_stat uv_stat {req->statbuf};
+
+            data->cb(data->p, 0, uv_stat);
         }
 
         delete data;

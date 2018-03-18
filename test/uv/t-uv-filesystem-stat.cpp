@@ -21,7 +21,7 @@ namespace
 
         int _result;
         int _error_result;
-        uv_stat_t _stat_result;
+        vfs::uv::uv_stat _stat_result;
 
         // </editor-fold>
 
@@ -70,7 +70,7 @@ namespace
 
         void when_stat_is_invoked()
         {
-            _result = _uv_fs.stat(_path.to_any(), [this](vfs::any_path &, int err, uv_stat_t stat)
+            _result = _uv_fs.stat(_path.to_any(), [this](vfs::any_path &, int err, vfs::uv::uv_stat stat)
             {
                 _error_result = err;
                 _stat_result = stat;
@@ -100,16 +100,12 @@ namespace
 
         void then_stat_result_is_set()
         {
-            static uv_stat_t unexpected = {};
-
-            ASSERT_NE(0, memcmp(&unexpected, &_stat_result, sizeof(uv_stat_t)));
+            ASSERT_TRUE(_stat_result.inode() > 0);
         }
 
         void then_stat_result_is_zeroed()
         {
-            static uv_stat_t expected = {};
-
-            ASSERT_EQ(0, memcmp(&expected, &_stat_result, sizeof(uv_stat_t)));
+            ASSERT_EQ(0, _stat_result.inode());
         }
 
         // </editor-fold>
