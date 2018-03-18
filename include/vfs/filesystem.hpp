@@ -7,7 +7,7 @@
 
 namespace vfs
 {
-    template<class t_path, class t_stat, class t_file, class t_buffer>
+    template<typename t_path, typename t_stat, typename t_file, typename t_buffer>
     class filesystem
     {
       public:
