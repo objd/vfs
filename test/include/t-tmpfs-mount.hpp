@@ -7,69 +7,66 @@
 
 #include "t-utils.hpp"
 
-namespace vfs
+namespace vfs::test
 {
-    namespace test
+    class tmpfs_mount
     {
-        class tmpfs_mount
+
+      private:
+
+        static const std::size_t default_size = 64 * 1024 * 1024;
+
+        std::string _mount_path;
+        std::size_t _size;
+
+        void mount()
         {
+            exec_or_throw("sudo mkdir " + _mount_path);
+            exec_or_throw("sudo mount -t tmpfs -o size=" + std::to_string(_size) + " tmpfs " + _mount_path);
+        }
 
-          private:
+        void unmount()
+        {
+            try_exec("sudo umount " + _mount_path);
+        }
 
-            static const std::size_t default_size = 64 * 1024 * 1024;
+        int try_exec(std::string cmd)
+        {
+            return std::system(cmd.c_str());
+        }
 
-            std::string _mount_path;
-            std::size_t _size;
+        void exec_or_throw(std::string cmd)
+        {
+            auto result = try_exec(cmd);
 
-            void mount()
+            if (result != 0)
             {
-                exec_or_throw("sudo mkdir " + _mount_path);
-                exec_or_throw("sudo mount -t tmpfs -o size=" + std::to_string(_size) + " tmpfs " + _mount_path);
+                throw std::exception {};
             }
+        }
 
-            void unmount()
-            {
-                try_exec("sudo umount " + _mount_path);
-            }
+      public:
 
-            int try_exec(std::string cmd)
-            {
-                return std::system(cmd.c_str());
-            }
+        tmpfs_mount()
+            : tmpfs_mount("/mnt/tmpfs-" + random_string(6))
+        {};
 
-            void exec_or_throw(std::string cmd)
-            {
-                auto result = try_exec(cmd);
+        tmpfs_mount(std::string mount_path, std::size_t size = default_size)
+            : _mount_path(mount_path), _size(size)
+        {
+            mount();
+        }
 
-                if (result != 0)
-                {
-                    throw std::exception {};
-                }
-            }
+        ~tmpfs_mount()
+        {
+            unmount();
+        }
 
-          public:
-
-            tmpfs_mount()
-                : tmpfs_mount("/mnt/tmpfs-" + random_string(6))
-            {};
-
-            tmpfs_mount(std::string mount_path, std::size_t size = default_size)
-                : _mount_path(mount_path), _size(size)
-            {
-                mount();
-            }
-
-            ~tmpfs_mount()
-            {
-                unmount();
-            }
-
-            std::string path()
-            {
-                return _mount_path;
-            }
-        };
-    }
+        std::string path()
+        {
+            return _mount_path;
+        }
+    };
 }
 
 #endif

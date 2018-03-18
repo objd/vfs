@@ -52,13 +52,13 @@ namespace vfs
             int move(vfs::any_path &&path, vfs::any_path &&move_path, move_cb cb) noexcept override;
             int copy(vfs::any_path &&path, vfs::any_path &&copy_path, copy_cb cb) noexcept override;
             int link(vfs::any_path &&path, vfs::any_path &&other_path, link_cb cb) noexcept override;
-            int symlink(vfs::any_path &path, vfs::any_path &other_path, symlink_cb cb) noexcept override;
+            int symlink(vfs::any_path &path, vfs::any_path &link_path, symlink_cb cb) noexcept override;
             int unlink(vfs::any_path &path, unlink_cb cb) noexcept override;
             int open(vfs::any_path &&path, int32_t mode, int32_t flags, open_cb cb) noexcept override;
             int stat(uv_file &file, fstat_cb cb) noexcept override;
             int read(uv_file &file, vfs::buffer &&buf, off64_t off, read_cb cb) noexcept override;
             int write(uv_file &file, vfs::buffer &&buf, off64_t off, write_cb cb) noexcept override;
-            int truncate(uv_file &file, uint64_t size, off64_t off, truncate_cb cb) noexcept override;
+            int truncate(uv_file &file, uint64_t size, truncate_cb cb) noexcept override;
             int close(uv_file &file, close_cb cb) noexcept override;
 
         };

@@ -196,7 +196,7 @@ namespace vfs
             return _value;
         }
 
-        static inline constexpr const char separator_c()
+        static inline constexpr char separator_c()
         {
             return '/';
         }

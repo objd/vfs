@@ -3,7 +3,7 @@
 #include <vfs/path.hpp>
 #include <vfs/filesystem.hpp>
 
-#include "vfs/uv/uv-filesystem.hpp"
+#include <vfs/uv/uv-filesystem.hpp>
 
 // <editor-fold desc="using">
 
@@ -26,6 +26,18 @@ using close_cb = typename vfs::uv::uv_filesystem::close_cb;
 
 // </editor-fold>
 
+static auto new_uv_req(void *data)
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+
+    return new uv_fs_t {
+        .data = data
+    };
+
+#pragma GCC diagnostic pop
+}
+
 // <editor-fold desc="exists">
 
 struct exists_cb_data
@@ -41,9 +53,7 @@ int vfs::uv::uv_filesystem::exists(vfs::any_path &&path, exists_cb cb) noexcept
         .cb = cb
     };
 
-    auto r = new uv_fs_t {
-        .data = d
-    };
+    auto r = new_uv_req(d);
 
     auto result = uv_fs_stat(_uv_loop, r, path.str().c_str(), [](uv_fs_t *req)
     {
@@ -99,7 +109,7 @@ int vfs::uv::uv_filesystem::stat(vfs::any_path &&path, stat_cb cb) noexcept
         .cb = cb
     };
 
-    auto r = new uv_fs_t {.data = d};
+    auto r = new_uv_req(d);
 
     auto result = uv_fs_stat(_uv_loop, r, path.str().c_str(), [](uv_fs_t *req)
     {
@@ -146,9 +156,7 @@ int vfs::uv::uv_filesystem::mkdir(vfs::any_path &&path, int32_t mode, mkdir_cb c
         .cb = cb
     };
 
-    auto r = new uv_fs_t {
-        .data = d
-    };
+    auto r = new_uv_req(d);
 
     auto result = uv_fs_mkdir(_uv_loop, r, path.str().c_str(), mode, [](uv_fs_t *req)
     {
@@ -184,6 +192,7 @@ int vfs::uv::uv_filesystem::mkdir(vfs::any_path &&path, int32_t mode, mkdir_cb c
 
 int vfs::uv::uv_filesystem::mkdirs(vfs::any_path &&path, int32_t mode, mkdirs_cb cb) noexcept
 {
+    (void) path;
     (void) mode;
     (void) cb;
 
@@ -209,39 +218,40 @@ int vfs::uv::uv_filesystem::create(vfs::any_path &&path, int32_t mode, create_cb
         .cb = cb
     };
 
-    auto r = new uv_fs_t {.data =  d};
+    auto r = new_uv_req(d);
 
-    auto result = uv_fs_open(_uv_loop, r, path.str().c_str(), UV_FS_O_CREAT | UV_FS_O_EXCL, mode, [](uv_fs_t *req) noexcept
-    {
-        uv_fs_req_cleanup(req);
-
-        auto data = get_uv_data<create_cb_data>(req);
-
-        if (req->result < 0)
-        {
-            data->cb(data->p, get_uv_error(req));
-        }
-        else
-        {
-            data->cb(data->p, 0);
-        }
-
-        auto file = get_uv_file(req);
-
-        auto async_result = uv_fs_close(data->fs._uv_loop, req, file, [](uv_fs_t *req)
+    auto result = uv_fs_open(
+        _uv_loop, r, path.str().c_str(), UV_FS_O_CREAT | UV_FS_O_EXCL, mode, [](uv_fs_t *req) noexcept
         {
             uv_fs_req_cleanup(req);
 
-            delete get_uv_data<create_cb_data>(req);
-            delete req;
-        });
+            auto data = get_uv_data<create_cb_data>(req);
 
-        if (async_result != 0)
-        {
-            delete data;
-            delete req;
-        }
-    });
+            if (req->result < 0)
+            {
+                data->cb(data->p, get_uv_error(req));
+            }
+            else
+            {
+                data->cb(data->p, 0);
+            }
+
+            auto file = get_uv_file(req);
+
+            auto async_result = uv_fs_close(data->fs._uv_loop, req, file, [](uv_fs_t *req)
+            {
+                uv_fs_req_cleanup(req);
+
+                delete get_uv_data<create_cb_data>(req);
+                delete req;
+            });
+
+            if (async_result != 0)
+            {
+                delete data;
+                delete req;
+            }
+        });
 
     if (result != 0)
     {
@@ -271,7 +281,7 @@ int vfs::uv::uv_filesystem::move(vfs::any_path &&path, vfs::any_path &&move_path
         .cb = cb
     };
 
-    auto r = new uv_fs_t {.data = d};
+    auto r = new_uv_req(d);
 
     auto result = uv_fs_rename(_uv_loop, r, path.str().c_str(), move_path.str().c_str(), [](uv_fs_t *req)
     {
@@ -281,9 +291,7 @@ int vfs::uv::uv_filesystem::move(vfs::any_path &&path, vfs::any_path &&move_path
 
         if (req->result < 0)
         {
-            auto err = get_uv_error(req);
-
-            data->cb(data->p, data->move_p, err);
+            data->cb(data->p, data->move_p, get_uv_error(req));
         }
         else
         {
@@ -322,7 +330,7 @@ int vfs::uv::uv_filesystem::copy(vfs::any_path &&path, vfs::any_path &&copy_path
         .cb = cb
     };
 
-    auto r = new uv_fs_t {.data = d};
+    auto r = new_uv_req(d);
 
     auto result = uv_fs_copyfile(_uv_loop, r, path.str().c_str(), copy_path.str().c_str(), 0, [](uv_fs_t *req)
     {
@@ -332,9 +340,7 @@ int vfs::uv::uv_filesystem::copy(vfs::any_path &&path, vfs::any_path &&copy_path
 
         if (req->result < 0)
         {
-            auto err = get_uv_error(req);
-
-            data->cb(data->p, data->copy_p, err);
+            data->cb(data->p, data->copy_p, get_uv_error(req));
         }
         else
         {
@@ -373,7 +379,7 @@ int vfs::uv::uv_filesystem::link(vfs::any_path &&path, vfs::any_path &&link_path
         .cb = cb
     };
 
-    auto r = new uv_fs_t {.data = d};
+    auto r = new_uv_req(d);
 
     auto result = uv_fs_link(_uv_loop, r, path.str().c_str(), link_path.str().c_str(), [](uv_fs_t *req)
     {
@@ -383,9 +389,7 @@ int vfs::uv::uv_filesystem::link(vfs::any_path &&path, vfs::any_path &&link_path
 
         if (req->result < 0)
         {
-            int err = get_uv_error(req);
-
-            data->cb(data->p, data->link_p, err);
+            data->cb(data->p, data->link_p, get_uv_error(req));
         }
         else
         {
@@ -412,21 +416,21 @@ int vfs::uv::uv_filesystem::link(vfs::any_path &&path, vfs::any_path &&link_path
 struct symlink_cb_data
 {
     vfs::any_path p;
-    vfs::any_path other_p;
+    vfs::any_path link_p;
     symlink_cb cb;
 };
 
-int vfs::uv::uv_filesystem::symlink(vfs::any_path &path, vfs::any_path &other_path, symlink_cb cb) noexcept
+int vfs::uv::uv_filesystem::symlink(vfs::any_path &path, vfs::any_path &link_path, symlink_cb cb) noexcept
 {
     auto d = new symlink_cb_data {
         .p = path,
-        .other_p = other_path,
+        .link_p = link_path,
         .cb = cb
     };
 
-    auto r = new uv_fs_t {.data = d};
+    auto r = new_uv_req(d);
 
-    auto result = uv_fs_symlink(_uv_loop, r, path.str().c_str(), other_path.str().c_str(), 0, [](uv_fs_t *req)
+    auto result = uv_fs_symlink(_uv_loop, r, path.str().c_str(), link_path.str().c_str(), 0, [](uv_fs_t *req)
     {
         uv_fs_req_cleanup(req);
 
@@ -434,20 +438,18 @@ int vfs::uv::uv_filesystem::symlink(vfs::any_path &path, vfs::any_path &other_pa
 
         if (req->result < 0)
         {
-            int err = get_uv_error(req);
-
-            data->cb(data->p, data->other_p, err);
+            data->cb(data->p, data->link_p, get_uv_error(req));
         }
         else
         {
-            data->cb(data->p, data->other_p, 0);
+            data->cb(data->p, data->link_p, 0);
         }
 
         delete data;
         delete req;
     });
 
-    if (result)
+    if (result != 0)
     {
         delete d;
         delete r;
@@ -473,7 +475,7 @@ int vfs::uv::uv_filesystem::unlink(vfs::any_path &path, unlink_cb cb) noexcept
         .cb = cb
     };
 
-    auto r = new uv_fs_t {.data = d};
+    auto r = new_uv_req(d);
 
     auto result = uv_fs_unlink(_uv_loop, r, path.str().c_str(), [](uv_fs_t *req)
     {
@@ -483,9 +485,7 @@ int vfs::uv::uv_filesystem::unlink(vfs::any_path &path, unlink_cb cb) noexcept
 
         if (req->result < 0)
         {
-            int err = get_uv_error(req);
-
-            data->cb(data->p, data->link_p, err);
+            data->cb(data->p, data->link_p, get_uv_error(req));
         }
         else
         {
@@ -496,7 +496,7 @@ int vfs::uv::uv_filesystem::unlink(vfs::any_path &path, unlink_cb cb) noexcept
         delete req;
     });
 
-    if (result)
+    if (result != 0)
     {
         delete d;
         delete r;
@@ -522,7 +522,7 @@ int vfs::uv::uv_filesystem::open(vfs::any_path &&path, int32_t mode, int32_t fla
         .cb = cb
     };
 
-    auto r = new uv_fs_t {.data = d};
+    auto r = new_uv_req(d);
 
     auto result = uv_fs_open(_uv_loop, r, path.str().c_str(), flags, mode, [](uv_fs_t *req)
     {
@@ -547,7 +547,7 @@ int vfs::uv::uv_filesystem::open(vfs::any_path &&path, int32_t mode, int32_t fla
         delete req;
     });
 
-    if (result)
+    if (result != 0)
     {
         delete d;
         delete r;
@@ -573,7 +573,7 @@ int vfs::uv::uv_filesystem::stat(uv_file &file, fstat_cb cb) noexcept
         .cb = cb
     };
 
-    auto r = new uv_fs_t {.data = d};
+    auto r = new_uv_req(d);
 
     auto result = uv_fs_fstat(_uv_loop, r, file, [](uv_fs_t *req)
     {
@@ -594,7 +594,7 @@ int vfs::uv::uv_filesystem::stat(uv_file &file, fstat_cb cb) noexcept
         delete req;
     });
 
-    if (result)
+    if (result != 0)
     {
         delete d;
         delete r;
@@ -622,7 +622,7 @@ int vfs::uv::uv_filesystem::read(uv_file &file, vfs::buffer &&buf, off64_t off, 
         .cb = cb
     };
 
-    auto r = new uv_fs_t {.data = d};
+    auto r = new_uv_req(d);
 
     uv_buf_t bufs[] = {
         {.base = d->buf.data<char>(), .len = d->buf.capacity()}
@@ -679,7 +679,7 @@ int vfs::uv::uv_filesystem::write(uv_file &file, vfs::buffer &&buf, off64_t off,
         .cb = cb
     };
 
-    auto r = new uv_fs_t {.data = d};
+    auto r = new_uv_req(d);
 
     uv_buf_t bufs[] = {
         {.base = d->buf.data<char>(), .len = d->buf.size()}
@@ -708,7 +708,7 @@ int vfs::uv::uv_filesystem::write(uv_file &file, vfs::buffer &&buf, off64_t off,
         delete req;
     });
 
-    if (result)
+    if (result != 0)
     {
         delete d;
         delete r;
@@ -721,9 +721,49 @@ int vfs::uv::uv_filesystem::write(uv_file &file, vfs::buffer &&buf, off64_t off,
 
 // <editor-fold desc="truncate">
 
-int vfs::uv::uv_filesystem::truncate(uv_file &file, uint64_t size, off64_t off, truncate_cb cb) noexcept
+struct truncate_cb_data
 {
-    return 0;
+    uv_file f;
+    truncate_cb cb;
+};
+
+int vfs::uv::uv_filesystem::truncate(uv_file &file, uint64_t size, truncate_cb cb) noexcept
+{
+    auto d = new truncate_cb_data {
+        .f = file,
+        .cb = cb
+    };
+
+    auto r = new_uv_req(d);
+
+    auto result = uv_fs_ftruncate(_uv_loop, r, file, size, [](uv_fs_t *req)
+    {
+        uv_fs_req_cleanup(req);
+
+        auto data = get_uv_data<truncate_cb_data>(req);
+
+        if (req->result < 0)
+        {
+            data->cb(data->f, get_uv_error(req), 0);
+        }
+        else
+        {
+            auto n_trunc = static_cast<uint64_t>(req->result);
+
+            data->cb(data->f, 0, n_trunc);
+        }
+
+        delete data;
+        delete req;
+    });
+
+    if (result != 0)
+    {
+        delete d;
+        delete r;
+    }
+
+    return result;
 }
 
 // </editor-fold>
@@ -743,7 +783,7 @@ int vfs::uv::uv_filesystem::close(uv_file &file, close_cb cb) noexcept
         .cb = cb
     };
 
-    auto r = new uv_fs_t {.data = d};
+    auto r = new_uv_req(d);
 
     auto result = uv_fs_close(_uv_loop, r, file, [](uv_fs_t *req)
     {
@@ -764,7 +804,7 @@ int vfs::uv::uv_filesystem::close(uv_file &file, close_cb cb) noexcept
         delete req;
     });
 
-    if (result)
+    if (result != 0)
     {
         delete d;
         delete r;

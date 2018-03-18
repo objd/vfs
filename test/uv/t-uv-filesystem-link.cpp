@@ -93,7 +93,7 @@ namespace
         void when_link_is_invoked()
         {
             _result = _uv_fs.link(_path.to_any(), _other_path.to_any(),
-                                  [this](vfs::any_path &path, vfs::any_path &other_path, int err)
+                                  [this](vfs::any_path &, vfs::any_path &, int err)
                                   {
                                       _error_result = err;
                                   });

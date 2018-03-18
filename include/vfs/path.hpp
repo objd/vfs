@@ -83,13 +83,13 @@ namespace vfs
         inline path &append(path &_path) noexcept override
         {
             auto &path = static_cast<t_path &>(_path);
-            return append(_path);
+            return append(path);
         }
 
-        inline path &&prepend(path &_path) noexcept override
+        inline path &prepend(path &_path) noexcept override
         {
             auto &path = static_cast<t_path &>(_path);
-            return prepend(_path);
+            return prepend(path);
         }
 
         friend inline std::ostream &operator<<(std::ostream &os, base_path<t_path> &path)

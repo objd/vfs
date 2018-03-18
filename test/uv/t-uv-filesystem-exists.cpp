@@ -73,7 +73,7 @@ namespace
 
         void when_exists_is_invoked()
         {
-            _result = _uv_fs.exists(_path.to_any(), [this](vfs::any_path &path, int err, bool exists)
+            _result = _uv_fs.exists(_path.to_any(), [this](vfs::any_path &, int err, bool exists)
             {
                 _error_result = err;
                 _exists_result = exists;

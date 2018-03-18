@@ -19,25 +19,25 @@ namespace vfs
 
       public:
         explicit buffer()
-            : _ptr(std::unique_ptr<uint8_t[]>{nullptr}), _size(0), _capacity(0)
+            : _size(0), _capacity(0), _ptr(std::unique_ptr<uint8_t[]>{nullptr})
         {}
 
         explicit buffer(uint64_t capacity)
-            : _ptr(std::make_unique<uint8_t[]>(capacity)), _size(0), _capacity(capacity)
+            : _size(0), _capacity(capacity), _ptr(std::make_unique<uint8_t[]>(capacity))
         {}
 
         explicit buffer(std::unique_ptr<uint8_t[]> &&ptr, uint64_t capacity)
-            : _ptr(std::move(ptr)), _size(0), _capacity(capacity)
+            : _size(0), _capacity(capacity), _ptr(std::move(ptr))
         {}
 
         explicit buffer(std::unique_ptr<uint8_t[]> &&ptr, uint64_t size, uint64_t capacity)
-            : _ptr(std::move(ptr)), _size(size), _capacity(capacity)
+            : _size(size), _capacity(capacity), _ptr(std::move(ptr))
         {}
 
         buffer(const buffer &lhs) = delete;
 
         buffer(buffer &&rhs) noexcept
-            : _ptr(std::move(rhs._ptr)), _size(rhs._size), _capacity(rhs._capacity)
+            : _size(rhs._size), _capacity(rhs._capacity), _ptr(std::move(rhs._ptr))
         {}
 
         buffer &operator=(const buffer &lhs) = delete;
@@ -51,12 +51,12 @@ namespace vfs
             return *this;
         };
 
-        const uint64_t size()
+        uint64_t size()
         {
             return _size;
         }
 
-        const uint64_t capacity()
+        uint64_t capacity()
         {
             return _capacity;
         }

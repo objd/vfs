@@ -73,7 +73,7 @@ namespace vfs
         virtual int stat(t_file &file, fstat_cb cb) noexcept = 0;
         virtual int read(t_file &file, t_buffer &&buf, off64_t off, read_cb cb) noexcept = 0;
         virtual int write(t_file &file, t_buffer &&buf, off64_t off, write_cb cb) noexcept = 0;
-        virtual int truncate(t_file &file, uint64_t size, off64_t off, truncate_cb cb) noexcept = 0;
+        virtual int truncate(t_file &file, uint64_t size, truncate_cb cb) noexcept = 0;
         virtual int close(t_file &file, close_cb cb) noexcept = 0;
     };
 }

@@ -72,7 +72,7 @@ namespace
 
         void when_create_is_invoked()
         {
-            _result = _uv_fs.create(_path.to_any(), 0664, [this](vfs::any_path &path, int err)
+            _result = _uv_fs.create(_path.to_any(), 0664, [this](vfs::any_path &, int err)
             {
                 _error_result = err;
             });

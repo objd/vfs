@@ -73,7 +73,7 @@ namespace
 
         void when_stat_is_invoked()
         {
-            _result = _uv_fs.stat(_path.to_any(), [this](vfs::any_path &path, int err, uv_stat_t stat)
+            _result = _uv_fs.stat(_path.to_any(), [this](vfs::any_path &, int err, uv_stat_t stat)
             {
                 _error_result = err;
                 _stat_result = stat;
