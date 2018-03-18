@@ -1,12 +1,9 @@
-#include <catch/catch.hpp>
+#include <gtest/gtest.h>
 
 #include <vfs/uv/uv-filesystem.hpp>
 #include <uv.h>
 
-#include "../include/t-tags.hpp"
 #include "../include/t-tmpfs-mount.hpp"
-
-#define TEST_TAG "[mkdir]"
 
 namespace
 {
@@ -86,17 +83,17 @@ namespace
 
         void then_result_is_zero()
         {
-            REQUIRE(0 == _result);
+            ASSERT_EQ(0, _result);
         }
 
         void then_error_result_is_zero()
         {
-            REQUIRE(0 == _error_result);
+            ASSERT_EQ(0, _error_result);
         }
 
         void then_error_result_is_eexist()
         {
-            REQUIRE(EEXIST == _error_result);
+            ASSERT_EQ(EEXIST, _error_result);
         }
 
         void then_path_is_a_directory()
@@ -104,14 +101,14 @@ namespace
             struct stat64 stat;
             stat64(_path.str().c_str(), &stat);
 
-            REQUIRE(S_ISDIR(stat.st_mode));
+            ASSERT_TRUE(S_ISDIR(stat.st_mode));
         }
 
         // </editor-fold>
     };
 
     // @formatter:off
-    TEST_CASE(TEST_TAG " It should create directory when directory does not exist", INTEGRATION_TEST_TAG)
+    TEST(uv_filesystem_mkdir, it_should_create_directory_when_directory_does_not_exist)
     {
         t_mkdir t;
 
@@ -129,7 +126,7 @@ namespace
     }
 
     // @formatter:off
-    TEST_CASE(TEST_TAG " It should return eexist when path already exist", INTEGRATION_TEST_TAG)
+    TEST(uv_filesystem_mkdir, it_should_return_eexist_when_path_already_exist)
     {
         t_mkdir t;
 

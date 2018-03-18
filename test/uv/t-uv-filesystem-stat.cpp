@@ -1,12 +1,9 @@
-#include <catch/catch.hpp>
+#include <gtest/gtest.h>
 
 #include <vfs/uv/uv-filesystem.hpp>
 #include <uv.h>
 
-#include "../include/t-tags.hpp"
 #include "../include/t-tmpfs-mount.hpp"
-
-#define TEST_TAG "[stat]"
 
 namespace
 {
@@ -88,38 +85,38 @@ namespace
 
         void then_result_is_zero()
         {
-            REQUIRE(0 == _result);
+            ASSERT_EQ(0, _result);
         }
 
         void then_error_result_is_zero()
         {
-            REQUIRE(0 == _error_result);
+            ASSERT_EQ(0, _error_result);
         }
 
         void then_error_result_is_enoent()
         {
-            REQUIRE(ENOENT == _error_result);
+            ASSERT_EQ(ENOENT, _error_result);
         }
 
         void then_stat_result_is_set()
         {
             static uv_stat_t unexpected = {};
 
-            REQUIRE_FALSE(0 == memcmp(&unexpected, &_stat_result, sizeof(uv_stat_t)));
+            ASSERT_NE(0, memcmp(&unexpected, &_stat_result, sizeof(uv_stat_t)));
         }
 
         void then_stat_result_is_zeroed()
         {
             static uv_stat_t expected = {};
 
-            REQUIRE(0 == memcmp(&expected, &_stat_result, sizeof(uv_stat_t)));
+            ASSERT_EQ(0, memcmp(&expected, &_stat_result, sizeof(uv_stat_t)));
         }
 
         // </editor-fold>
     };
 
     // @formatter:off
-    TEST_CASE(TEST_TAG " It should return stat struct when file exists", INTEGRATION_TEST_TAG)
+    TEST(uv_filesystem_stat, it_should_return_stat_struct_when_file_exists)
     {
         t_stat t;
 
@@ -136,7 +133,7 @@ namespace
         t.then_stat_result_is_set();
     }
 
-    TEST_CASE(TEST_TAG " It should return enoent when file does not exist", INTEGRATION_TEST_TAG)
+    TEST(uv_filesystem_stat, it_should_return_enoent_when_file_does_not_exist)
     {
         t_stat t;
 

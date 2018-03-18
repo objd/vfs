@@ -1,12 +1,9 @@
-#include <catch/catch.hpp>
+#include <gtest/gtest.h>
 
 #include <vfs/uv/uv-filesystem.hpp>
 #include <uv.h>
 
-#include "../include/t-tags.hpp"
 #include "../include/t-tmpfs-mount.hpp"
-
-#define TEST_TAG "[create]"
 
 namespace
 {
@@ -86,17 +83,17 @@ namespace
 
         void then_result_is_zero()
         {
-            REQUIRE(0 == _result);
+            ASSERT_EQ(0, _result);
         }
 
         void then_error_result_is_zero()
         {
-            REQUIRE(0 == _error_result);
+            ASSERT_EQ(0, _error_result);
         }
 
         void then_error_result_is_eexist()
         {
-            REQUIRE(EEXIST == _error_result);
+            ASSERT_EQ(EEXIST, _error_result);
         }
 
         void then_path_is_a_file()
@@ -104,14 +101,14 @@ namespace
             struct stat64 stat;
             stat64(_path.str().c_str(), &stat);
 
-            REQUIRE(S_ISREG(stat.st_mode));
+            ASSERT_TRUE(S_ISREG(stat.st_mode));
         }
 
         // </editor-fold>
     };
 
     // @formatter:off
-    TEST_CASE(TEST_TAG " It should create file when file does not exist", INTEGRATION_TEST_TAG)
+    TEST(uv_filesystem_create, it_should_create_file_when_file_does_not_exist)
     {
         t_create t;
 
@@ -129,7 +126,7 @@ namespace
     }
 
     // @formatter:off
-    TEST_CASE(TEST_TAG " It should return eexist when path exist", INTEGRATION_TEST_TAG)
+    TEST(uv_filesystem_create, it_should_return_eexist_when_path_exist)
     {
         t_create t;
 

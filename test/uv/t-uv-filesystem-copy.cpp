@@ -1,12 +1,9 @@
-#include <catch/catch.hpp>
+#include <gtest/gtest.h>
 
 #include <vfs/uv/uv-filesystem.hpp>
 #include <uv.h>
 
-#include "../include/t-tags.hpp"
 #include "../include/t-tmpfs-mount.hpp"
-
-#define TEST_TAG "[copy]"
 
 namespace
 {
@@ -108,22 +105,22 @@ namespace
 
         void then_result_is_zero()
         {
-            REQUIRE(0 == _result);
+            ASSERT_EQ(0, _result);
         }
 
         void then_error_result_is_zero()
         {
-            REQUIRE(0 == _error_result);
+            ASSERT_EQ(0, _error_result);
         }
 
         void then_error_result_is_enoent()
         {
-            REQUIRE(ENOENT == _error_result);
+            ASSERT_EQ(ENOENT, _error_result);
         }
 
         void then_error_result_is_eexist()
         {
-            REQUIRE(EEXIST == _error_result);
+            ASSERT_EQ(EEXIST, _error_result);
         }
 
         void then_path_has_been_copied()
@@ -132,20 +129,20 @@ namespace
 
             auto err = stat64(_path.str().c_str(), &stat);
 
-            REQUIRE(0 == err);
-            REQUIRE(S_ISREG(stat.st_mode));
+            ASSERT_EQ(0, err);
+            ASSERT_TRUE(S_ISREG(stat.st_mode));
 
             err = stat64(_other_path.str().c_str(), &stat);
 
-            REQUIRE(0 == err);
-            REQUIRE(S_ISREG(stat.st_mode));
+            ASSERT_EQ(0, err);
+            ASSERT_TRUE(S_ISREG(stat.st_mode));
         }
 
         // </editor-fold>
     };
 
     // @formatter:off
-    TEST_CASE(TEST_TAG " It should copy file when other path does not exist", INTEGRATION_TEST_TAG)
+    TEST(uv_filesystem_copy, it_should_copy_file_when_other_path_does_not_exist)
     {
         t_copy t;
 
@@ -164,7 +161,7 @@ namespace
     }
 
     // @formatter:off
-    TEST_CASE(TEST_TAG " It should copy file even if other path exist", INTEGRATION_TEST_TAG)
+    TEST(uv_filesystem_copy, it_should_copy_file_even_if_other_path_exist)
     {
         t_copy t;
 
@@ -183,7 +180,7 @@ namespace
     }
 
     // @formatter:off
-    TEST_CASE(TEST_TAG " It should return enoent when path does not exist", INTEGRATION_TEST_TAG)
+    TEST(uv_filesystem_copy, it_should_return_enoent_when_path_does_not_exist)
     {
         t_copy t;
 

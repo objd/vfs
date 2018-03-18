@@ -1,11 +1,10 @@
-#include <catch/catch.hpp>
-#include <vfs/buffer.hpp>
+#include <gtest/gtest.h>
 
-#include "include/t-tags.hpp"
+#include <vfs/buffer.hpp>
 
 namespace
 {
-    class test // NOLINT
+    class test
     {
       private:
 
@@ -104,28 +103,27 @@ namespace
 
         void then_the_capacity_of_the_buffer_is_the_capacity()
         {
-            REQUIRE (_capacity == _buffer.capacity());
+            ASSERT_EQ(_capacity, _buffer.capacity());
         }
 
         void then_the_size_of_the_buffer_is_zero()
         {
-
-            REQUIRE (0 == _buffer.size());
+            ASSERT_EQ(0, _buffer.size());
         }
 
         void then_the_size_of_the_buffer_is_the_data_struct_size()
         {
-            REQUIRE (sizeof(_data_struct) == _buffer.size());
+            ASSERT_EQ(sizeof(_data_struct), _buffer.size());
         }
 
         void then_the_size_of_the_buffer_is_the_data_ptr_size()
         {
-            REQUIRE (_data_ptr_sz == _buffer.size());
+            ASSERT_EQ(_data_ptr_sz, _buffer.size());
         }
 
         void then_the_data_in_the_buffer_is_the_data_struct()
         {
-            REQUIRE (0 == memcmp(&_data_struct, _buffer.data(), _buffer.size()));
+            ASSERT_EQ(0, memcmp(&_data_struct, _buffer.data(), _buffer.size()));
         }
 
         // </editor-fold>
@@ -133,7 +131,7 @@ namespace
 
     // <editor-fold name="Put">
 
-    TEST_CASE("It should append as-is if values are absoluteaaf asfasf", UNIT_TEST_TAG)
+    TEST(buffer_put, it_should_append_as_is_if_values_are_absoluteaaf_asfasf)
     {
         test t;
 

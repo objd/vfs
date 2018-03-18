@@ -1,12 +1,9 @@
-#include <catch/catch.hpp>
+#include <gtest/gtest.h>
 
 #include <vfs/uv/uv-filesystem.hpp>
 #include <uv.h>
 
-#include "../include/t-tags.hpp"
 #include "../include/t-tmpfs-mount.hpp"
-
-#define TEST_TAG "[exist]"
 
 namespace
 {
@@ -88,29 +85,29 @@ namespace
 
         void then_result_is_zero()
         {
-            REQUIRE(0 == _result);
+            ASSERT_EQ(0, _result);
         }
 
         void then_error_result_is_zero()
         {
-            REQUIRE(0 == _error_result);
+            ASSERT_EQ(0, _error_result);
         }
 
         void then_exist_result_is_true()
         {
-            REQUIRE(_exists_result);
+            ASSERT_TRUE(_exists_result);
         }
 
         void then_exist_result_is_false()
         {
-            REQUIRE_FALSE(_exists_result);
+            ASSERT_FALSE(_exists_result);
         }
 
         // </editor-fold>
     };
 
     // @formatter:off
-    TEST_CASE(TEST_TAG " It should return true when file exists", INTEGRATION_TEST_TAG)
+    TEST(uv_filesystem_exists, it_should_return_true_when_file_exists)
     {
         t_exists t;
 
@@ -126,7 +123,7 @@ namespace
         t.then_exist_result_is_true();
     }
 
-    TEST_CASE(TEST_TAG " It should return false when file does not exist", INTEGRATION_TEST_TAG)
+    TEST(uv_filesystem_exists, It_should_return_false_when_file_does_not_exist)
     {
         t_exists t;
 

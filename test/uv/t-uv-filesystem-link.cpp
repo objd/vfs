@@ -1,12 +1,9 @@
-#include <catch/catch.hpp>
+#include <gtest/gtest.h>
 
 #include <vfs/uv/uv-filesystem.hpp>
 #include <uv.h>
 
-#include "../include/t-tags.hpp"
 #include "../include/t-tmpfs-mount.hpp"
-
-#define TEST_TAG "[link]"
 
 namespace
 {
@@ -107,22 +104,22 @@ namespace
 
         void then_result_is_zero()
         {
-            REQUIRE(0 == _result);
+            ASSERT_EQ(0, _result);
         }
 
         void then_error_result_is_zero()
         {
-            REQUIRE(0 == _error_result);
+            ASSERT_EQ(0, _error_result);
         }
 
         void then_error_result_is_enoent()
         {
-            REQUIRE(ENOENT == _error_result);
+            ASSERT_EQ(ENOENT, _error_result);
         }
 
         void then_error_result_is_eexist()
         {
-            REQUIRE(EEXIST == _error_result);
+            ASSERT_EQ(EEXIST, _error_result);
         }
 
         void then_path_has_been_linked()
@@ -131,24 +128,24 @@ namespace
 
             auto err = stat64(_path.str().c_str(), &stat);
 
-            REQUIRE(0 == err);
-            REQUIRE(S_ISREG(stat.st_mode));
+            ASSERT_EQ(0, err);
+            ASSERT_TRUE(S_ISREG(stat.st_mode));
 
             struct stat64 other_stat;
 
             err = stat64(_other_path.str().c_str(), &other_stat);
 
-            REQUIRE(0 == err);
-            REQUIRE(S_ISREG(other_stat.st_mode));
+            ASSERT_EQ(0, err);
+            ASSERT_TRUE(S_ISREG(other_stat.st_mode));
 
-            REQUIRE(stat.st_ino == other_stat.st_ino);
+            ASSERT_EQ(stat.st_ino, other_stat.st_ino);
         }
 
         // </editor-fold>
     };
 
     // @formatter:off
-    TEST_CASE(TEST_TAG " It should link file when other path does not exist", INTEGRATION_TEST_TAG)
+    TEST(uv_filesystem_link, it_should_link_file_when_other_path_does_not_exist)
     {
         t_link t;
 
@@ -167,7 +164,7 @@ namespace
     }
 
     // @formatter:off
-    TEST_CASE(TEST_TAG " It should return eexist when other path exist", INTEGRATION_TEST_TAG)
+    TEST(uv_filesystem_link, it_should_return_eexist_when_other_path_exist)
     {
         t_link t;
 
@@ -184,7 +181,7 @@ namespace
     }
 
     // @formatter:off
-    TEST_CASE(TEST_TAG " It should return enoent when path does not exist", INTEGRATION_TEST_TAG)
+    TEST(uv_filesystem_link, it_should_return_enoent_when_path_does_not_exist)
     {
         t_link t;
 
