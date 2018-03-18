@@ -48,7 +48,7 @@ namespace vfs::test
 
       public:
 
-        tmpfs_mount()
+        explicit tmpfs_mount()
             : tmpfs_mount("/mnt/tmpfs-" + random_string(6))
         {};
 

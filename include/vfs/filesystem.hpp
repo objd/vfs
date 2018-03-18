@@ -7,7 +7,7 @@
 
 namespace vfs
 {
-    template<typename t_path, typename t_stat, typename t_file, typename t_buffer>
+    template<class t_path, class t_stat, class t_file, class t_buffer>
     class filesystem
     {
       public:
@@ -59,22 +59,22 @@ namespace vfs
         using close_cb = std::function<
             void(t_file &, int)>;
 
-        virtual int exists(t_path &&path, exists_cb cb) noexcept = 0;
-        virtual int stat(t_path &&path, stat_cb cb) noexcept = 0;
-        virtual int mkdir(t_path &&path, int32_t mode, mkdir_cb cb) noexcept = 0;
-        virtual int mkdirs(t_path &&path, int32_t mode, mkdirs_cb cb) noexcept = 0;
-        virtual int create(t_path &&path, int32_t mode, create_cb cb) noexcept = 0;
-        virtual int move(t_path &&path, t_path &&move_path, move_cb cb) noexcept = 0;
-        virtual int copy(t_path &&path, t_path &&copy_path, copy_cb cb) noexcept = 0;
-        virtual int link(t_path &&path, t_path &&other_path, link_cb cb) noexcept = 0;
-        virtual int symlink(t_path &&path, t_path &&other_path, symlink_cb cb) noexcept = 0;
-        virtual int unlink(t_path &&path, unlink_cb cb) noexcept = 0;
-        virtual int open(t_path &&path, int32_t mode, int32_t flags, open_cb cb) noexcept = 0;
-        virtual int stat(t_file &file, fstat_cb cb) noexcept = 0;
-        virtual int read(t_file &file, t_buffer &&buf, off64_t off, read_cb cb) noexcept = 0;
-        virtual int write(t_file &file, t_buffer &&buf, off64_t off, write_cb cb) noexcept = 0;
-        virtual int truncate(t_file &file, uint64_t size, truncate_cb cb) noexcept = 0;
-        virtual int close(t_file &file, close_cb cb) noexcept = 0;
+        virtual int exists(t_path path, exists_cb cb) noexcept = 0;
+        virtual int stat(t_path path, stat_cb cb) noexcept = 0;
+        virtual int mkdir(t_path path, int32_t mode, mkdir_cb cb) noexcept = 0;
+        virtual int mkdirs(t_path path, int32_t mode, mkdirs_cb cb) noexcept = 0;
+        virtual int create(t_path path, int32_t mode, create_cb cb) noexcept = 0;
+        virtual int move(t_path path, t_path move_path, move_cb cb) noexcept = 0;
+        virtual int copy(t_path path, t_path copy_path, copy_cb cb) noexcept = 0;
+        virtual int link(t_path path, t_path other_path, link_cb cb) noexcept = 0;
+        virtual int symlink(t_path path, t_path other_path, symlink_cb cb) noexcept = 0;
+        virtual int unlink(t_path path, unlink_cb cb) noexcept = 0;
+        virtual int open(t_path path, int32_t mode, int32_t flags, open_cb cb) noexcept = 0;
+        virtual int stat(t_file file, fstat_cb cb) noexcept = 0;
+        virtual int read(t_file file, t_buffer buf, off64_t off, read_cb cb) noexcept = 0;
+        virtual int write(t_file file, t_buffer buf, off64_t off, write_cb cb) noexcept = 0;
+        virtual int truncate(t_file file, uint64_t size, truncate_cb cb) noexcept = 0;
+        virtual int close(t_file file, close_cb cb) noexcept = 0;
     };
 }
 

@@ -4,123 +4,30 @@
 #include <uv.h>
 
 #include "../include/t-tmpfs-mount.hpp"
+#include "t-uv-filesystem-base.hpp"
 
 namespace
 {
-    class t_move
+    class t_move :
+        public vfs::test::t_uv_filesystem_base
     {
-      private:
-
-        // <editor-fold name="Context">
-
-        vfs::test::tmpfs_mount _mount;
-
-        uv_loop_t *_uv_loop;
-        vfs::unix_path _path;
-        vfs::unix_path _other_path;
-        vfs::uv::uv_filesystem _uv_fs;
-
-        int _result;
-        int _error_result;
-
-        // </editor-fold>
-
       public:
-
-        ~t_move()
-        {
-            uv_loop_close(_uv_loop);
-            free(_uv_loop);
-        }
-
-        // <editor-fold name="Given">
-
-        void given_an_uv_loop()
-        {
-            _uv_loop = uv_loop_new();
-        }
-
-        void given_an_uv_filesystem()
-        {
-            _uv_fs = vfs::uv::uv_filesystem {_uv_loop};
-        }
-
-        void given_an_existing_path()
-        {
-            _path = vfs::unix_path{_mount.path()}
-                .append("existing");
-
-            auto result = system(("touch " + _path.str()).c_str());
-
-            if (result != 0)
-            {
-                throw std::exception {};
-            }
-        }
-
-        void given_an_existing_other_path()
-        {
-            _other_path = vfs::unix_path{_mount.path()}
-                .append("other_existing");
-
-            auto result = system(("touch " + _other_path.str()).c_str());
-
-            if (result != 0)
-            {
-                throw std::exception {};
-            }
-        }
-
-        void given_an_unexisting_path()
-        {
-            _path = vfs::unix_path{_mount.path()}
-                .append("unexisting");
-        }
-
-        void given_an_unexisting_other_path()
-        {
-            _other_path = vfs::unix_path{_mount.path()}
-                .append("other_unexisting");
-        }
-
-        // </editor-fold>
 
         // <editor-fold name="When">
 
         void when_move_is_invoked()
         {
-            _result = _uv_fs.move(
-                _path.to_any(), _other_path.to_any(), [this](vfs::any_path &, vfs::any_path &, int err)
-                {
-                    _error_result = err;
-                });
+            _result = _uv_fs.move(_path, _other_path, [this](vfs::any_path &, vfs::any_path &, int err)
+            {
+                _error_result = err;
+            });
 
-            uv_run(_uv_loop, UV_RUN_DEFAULT);
+            _uv_fs.loop().run();
         }
 
         // </editor-fold>
 
         // <editor-fold name="Then">
-
-        void then_result_is_zero()
-        {
-            ASSERT_EQ(0, _result);
-        }
-
-        void then_error_result_is_zero()
-        {
-            ASSERT_EQ(0, _error_result);
-        }
-
-        void then_error_result_is_enoent()
-        {
-            ASSERT_EQ(ENOENT, _error_result);
-        }
-
-        void then_error_result_is_eexist()
-        {
-            ASSERT_EQ(EEXIST, _error_result);
-        }
 
         void then_path_has_not_been_moved()
         {
@@ -160,9 +67,6 @@ namespace
     {
         t_move t;
 
-        t.given_an_uv_loop();
-        t.given_an_uv_filesystem();
-
         t.given_an_existing_path();
         t.given_an_unexisting_other_path();
 
@@ -179,9 +83,6 @@ namespace
     {
         t_move t;
 
-        t.given_an_uv_loop();
-        t.given_an_uv_filesystem();
-
         t.given_an_existing_path();
         t.given_an_existing_other_path();
 
@@ -197,9 +98,6 @@ namespace
     TEST(uv_filesystem_move, it_should_return_enoent_when_path_does_not_exist)
     {
         t_move t;
-
-        t.given_an_uv_loop();
-        t.given_an_uv_filesystem();
 
         t.given_an_unexisting_path();
         t.given_an_unexisting_other_path();

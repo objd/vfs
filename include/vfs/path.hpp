@@ -17,19 +17,15 @@ namespace vfs
         path, std::remove_reference_t<t_path>>;
 
     template<typename t_path>
-    using enable_if_path = std::enable_if_t<
+    using enable_if_is_path = std::enable_if_t<
         is_path<t_path>::value>;
-
-    template<typename t_path>
-    using disable_if_path = std::enable_if_t<
-        !is_path<t_path>::value>;
 
     template<typename t_path>
     using is_base_path = std::is_base_of<
         base_path<t_path>, std::remove_reference_t<t_path>>;
 
     template<typename t_path>
-    using enable_if_base_path = std::enable_if_t<
+    using enable_if_is_base_path = std::enable_if_t<
         is_base_path<t_path>::value>;
 
     template<typename t_path>
@@ -37,7 +33,7 @@ namespace vfs
         any_path, std::remove_reference_t<t_path>>;
 
     template<typename t_path>
-    using disable_if_any_path = std::enable_if_t<
+    using disable_if_is_any_path = std::enable_if_t<
         !is_any_path<t_path>::value>;
 
     class path
@@ -64,12 +60,7 @@ namespace vfs
 
         virtual path &parent() noexcept = 0;
         virtual path &filename() noexcept = 0;
-
-//        template<typename t_path>
-//        inline t_path copy() const noexcept
-//        {
-//            return static_cast<t_path &>(*this);
-//        };
+        virtual path &clear() noexcept = 0;
     };
 
     template<typename t_path>
@@ -106,10 +97,10 @@ namespace vfs
 
       public:
 
-        template<typename t_path, typename = enable_if_base_path<t_path>, typename = disable_if_any_path<t_path>>
+        template<typename t_path, typename = enable_if_is_base_path<t_path>, typename = disable_if_is_any_path<t_path>>
         explicit any_path(t_path &path)
             : _path(path)
-        { }
+        {}
 
 //        template<typename t_path/*, typename = enable_if_base_path<t_path>*/>
 //        any_path(t_path *path)
@@ -133,12 +124,12 @@ namespace vfs
 //            return *this;
 //        }
 //
-//        template<typename t_path/*, typename = enable_if_base_path<t_path>*/>
-//        inline any_path &operator=(t_path &&path) noexcept
-//        {
-//            _path = path;
-//            return *this;
-//        }
+        template<typename t_path/*, typename = enable_if_base_path<t_path>*/>
+        inline any_path &operator=(t_path &&path) noexcept
+        {
+            _path = path;
+            return *this;
+        }
 
         template<typename t_path>
         inline operator t_path &() const
@@ -213,6 +204,12 @@ namespace vfs
             _path.filename();
             return *this;
         };
+
+        inline any_path &clear() noexcept override
+        {
+            _path.clear();
+            return *this;
+        }
 
         inline const std::string &str() const noexcept override
         {

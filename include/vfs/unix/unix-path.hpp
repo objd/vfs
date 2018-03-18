@@ -25,10 +25,10 @@ namespace vfs
         {}
 
         unix_path(const unix_path &lhs) noexcept
-            : _value(lhs._value) // NOLINT
+            : _value(lhs._value)
         {}
 
-        inline unix_path &operator=(const unix_path &other) noexcept // NOLINT
+        inline unix_path &operator=(const unix_path &other) noexcept
         {
             _value = other._value;
             return *this;
@@ -177,6 +177,12 @@ namespace vfs
                 }
             }
 
+            return *this;
+        }
+
+        inline unix_path &clear() noexcept override
+        {
+            _value.clear();
             return *this;
         }
 
