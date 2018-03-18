@@ -10,8 +10,6 @@ include_directories(deps include)
 add_subdirectory(src)
 add_subdirectory(test)
 
-enable_testing()
-
 # Download and unpack googletest at configure time
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
 
