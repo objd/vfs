@@ -37,6 +37,10 @@ before_install: &bi
   # Update all libraries
   - sudo apt-get update --yes -qq
 
+  # Update g++ alternatives
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
+
   # Install uv libraries
   - git clone https://github.com/objd/libuv
   - cd libuv
