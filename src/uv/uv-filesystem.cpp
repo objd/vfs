@@ -420,7 +420,7 @@ struct symlink_cb_data
     symlink_cb cb;
 };
 
-int vfs::uv::uv_filesystem::symlink(vfs::any_path &path, vfs::any_path &link_path, symlink_cb cb) noexcept
+int vfs::uv::uv_filesystem::symlink(vfs::any_path &&path, vfs::any_path &&link_path, symlink_cb cb) noexcept
 {
     auto d = new symlink_cb_data {
         .p = path,
@@ -468,7 +468,7 @@ struct unlink_cb_data
     unlink_cb cb;
 };
 
-int vfs::uv::uv_filesystem::unlink(vfs::any_path &path, unlink_cb cb) noexcept
+int vfs::uv::uv_filesystem::unlink(vfs::any_path &&path, unlink_cb cb) noexcept
 {
     auto d = new unlink_cb_data {
         .p = path,

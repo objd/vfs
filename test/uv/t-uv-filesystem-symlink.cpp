@@ -7,7 +7,7 @@
 
 namespace
 {
-    class t_link
+    class t_symlink
     {
       private:
 
@@ -27,7 +27,7 @@ namespace
 
       public:
 
-        ~t_link()
+        ~t_symlink()
         {
             uv_loop_close(_uv_loop);
             free(_uv_loop);
@@ -87,13 +87,14 @@ namespace
 
         // <editor-fold name="When">
 
-        void when_link_is_invoked()
+        void when_symlink_is_invoked()
         {
-            _result = _uv_fs.link(_path.to_any(), _other_path.to_any(),
-                                  [this](vfs::any_path &, vfs::any_path &, int err)
-                                  {
-                                      _error_result = err;
-                                  });
+            _result = _uv_fs.symlink(
+                _path.to_any(), _other_path.to_any(),
+                [this](vfs::any_path &, vfs::any_path &, int err)
+                {
+                    _error_result = err;
+                });
 
             uv_run(_uv_loop, UV_RUN_DEFAULT);
         }
@@ -136,18 +137,18 @@ namespace
             err = lstat64(_other_path.str().c_str(), &other_stat);
 
             ASSERT_EQ(0, err);
-            ASSERT_TRUE(S_ISREG(other_stat.st_mode));
+            ASSERT_TRUE(S_ISLNK(other_stat.st_mode));
 
-            ASSERT_EQ(stat.st_ino, other_stat.st_ino);
+            ASSERT_NE(stat.st_ino, other_stat.st_ino);
         }
 
         // </editor-fold>
     };
 
     // @formatter:off
-    TEST(uv_filesystem_link, it_should_link_file_when_other_path_does_not_exist)
+    TEST(uv_filesystem_symlink, it_should_link_file_when_other_path_does_not_exist)
     {
-        t_link t;
+        t_symlink t;
 
         t.given_an_uv_loop();
         t.given_an_uv_filesystem();
@@ -155,7 +156,7 @@ namespace
         t.given_an_existing_path();
         t.given_an_unexisting_other_path();
 
-        t.when_link_is_invoked();
+        t.when_symlink_is_invoked();
 
         t.then_result_is_zero();
         t.then_error_result_is_zero();
@@ -164,9 +165,9 @@ namespace
     }
 
     // @formatter:off
-    TEST(uv_filesystem_link, it_should_return_eexist_when_other_path_exist)
+    TEST(uv_filesystem_symlink, it_should_return_eexist_when_other_path_exist)
     {
-        t_link t;
+        t_symlink t;
 
         t.given_an_uv_loop();
         t.given_an_uv_filesystem();
@@ -174,26 +175,9 @@ namespace
         t.given_an_existing_path();
         t.given_an_existing_other_path();
 
-        t.when_link_is_invoked();
+        t.when_symlink_is_invoked();
 
         t.then_result_is_zero();
         t.then_error_result_is_eexist();
-    }
-
-    // @formatter:off
-    TEST(uv_filesystem_link, it_should_return_enoent_when_path_does_not_exist)
-    {
-        t_link t;
-
-        t.given_an_uv_loop();
-        t.given_an_uv_filesystem();
-
-        t.given_an_unexisting_path();
-        t.given_an_unexisting_other_path();
-
-        t.when_link_is_invoked();
-
-        t.then_result_is_zero();
-        t.then_error_result_is_enoent();
     }
 }

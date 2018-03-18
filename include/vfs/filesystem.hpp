@@ -67,8 +67,8 @@ namespace vfs
         virtual int move(t_path &&path, t_path &&move_path, move_cb cb) noexcept = 0;
         virtual int copy(t_path &&path, t_path &&copy_path, copy_cb cb) noexcept = 0;
         virtual int link(t_path &&path, t_path &&other_path, link_cb cb) noexcept = 0;
-        virtual int symlink(t_path &path, t_path &other_path, symlink_cb cb) noexcept = 0;
-        virtual int unlink(t_path &path, unlink_cb cb) noexcept = 0;
+        virtual int symlink(t_path &&path, t_path &&other_path, symlink_cb cb) noexcept = 0;
+        virtual int unlink(t_path &&path, unlink_cb cb) noexcept = 0;
         virtual int open(t_path &&path, int32_t mode, int32_t flags, open_cb cb) noexcept = 0;
         virtual int stat(t_file &file, fstat_cb cb) noexcept = 0;
         virtual int read(t_file &file, t_buffer &&buf, off64_t off, read_cb cb) noexcept = 0;

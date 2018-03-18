@@ -131,7 +131,7 @@ namespace
 
     // <editor-fold name="Put">
 
-    TEST(buffer_put, it_should_append_as_is_if_values_are_absoluteaaf_asfasf)
+    TEST(buffer_ctor, it_should_create_a_valid_buffer)
     {
         test t;
 
