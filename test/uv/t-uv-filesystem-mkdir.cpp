@@ -17,7 +17,7 @@ namespace
 
         void when_mkdir_is_invoked()
         {
-            _result = _uv_fs.mkdir(_path, 0775, [this](vfs::any_path &, int err)
+            _result = _uv_fs.mkdir(_path, [this](vfs::any_path &, int err)
             {
                 _error_result = err;
             });

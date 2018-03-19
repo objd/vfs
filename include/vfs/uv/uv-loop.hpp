@@ -17,16 +17,6 @@ namespace vfs::uv
 
         virtual uv_loop_t *ptr() const noexcept = 0;
 
-//        inline uv_loop_t &operator*() const noexcept
-//        {
-//            return *ptr();
-//        }
-//
-//        inline uv_loop_t *operator&() const &noexcept
-//        {
-//            return ptr();
-//        }
-
         inline operator uv_loop_t *() &noexcept
         {
             return ptr();
@@ -112,47 +102,6 @@ namespace vfs::uv
             return _uv_loop.get();
         }
     };
-
-//    class uv_loop
-//    {
-//      private:
-//        std::shared_ptr<uv_loop_t> _uv_loop;
-////        uv_loop_t _uv_loop;
-//
-//      public:
-//
-//        uv_loop()
-//            : uv_loop(uv_loop_new())
-//        {
-//            _uv_loop = std::make_shared(uv_loop_new());
-//            auto result = uv_loop_init(&_uv_loop);
-//
-//            if (result != 0)
-//            {
-//                throw std::exception {};
-//            }
-//        }
-//
-//        uv_loop(std::shared_ptr<uv_loop_t> uv_loop)
-//            : _uv_loop(uv_loop)
-//        {
-//        }
-//
-//        ~uv_loop() noexcept
-//        {
-//            uv_loop_close(&_uv_loop);
-//        }
-//
-//        inline uv_loop_t *ptr() const noexcept
-//        {
-//            return const_cast<uv_loop_t * >(&_uv_loop);
-//        }
-//
-//        inline int run(uv_run_mode mode = UV_RUN_DEFAULT)
-//        {
-//            return uv_run(&_uv_loop, mode);
-//        }
-//    };
 }
 
 #endif

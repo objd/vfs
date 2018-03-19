@@ -1,7 +1,9 @@
 #ifndef VFS_CPP_FILESYSTEM_H
 #define VFS_CPP_FILESYSTEM_H
 
+#include <fcntl.h>
 #include <functional>
+
 #include <vfs/path.hpp>
 #include <vfs/buffer.hpp>
 
@@ -10,7 +12,9 @@ namespace vfs
     template<typename t_path, typename t_stat, typename t_file, typename t_buffer>
     class filesystem
     {
+
       public:
+
         using exists_cb = std::function<
             void(t_path &, int, bool)>;
 
@@ -59,6 +63,34 @@ namespace vfs
         using close_cb = std::function<
             void(t_file &, int)>;
 
+        virtual ~filesystem() noexcept
+        {};
+
+        int mkdir(t_path path, mkdir_cb cb) noexcept
+        {
+            return mkdir(path, default_dir_mode(), cb);
+        };
+
+        int mkdirs(t_path path, mkdirs_cb cb) noexcept
+        {
+            return mkdirs(path, default_dir_mode(), cb);
+        };
+
+        int create(t_path path, create_cb cb) noexcept
+        {
+            return create(path, default_file_mode(), cb);
+        };
+
+        inline int open(t_path path, open_cb cb) noexcept
+        {
+            return open(path, default_file_mode(), default_open_mode(), cb);
+        };
+
+        inline int open(t_path path, int32_t flags, open_cb cb) noexcept
+        {
+            return open(path, default_file_mode(), flags, cb);
+        };
+
         virtual int exists(t_path path, exists_cb cb) noexcept = 0;
         virtual int stat(t_path path, stat_cb cb) noexcept = 0;
         virtual int mkdir(t_path path, int32_t mode, mkdir_cb cb) noexcept = 0;
@@ -75,6 +107,21 @@ namespace vfs
         virtual int write(t_file file, t_buffer buf, off64_t off, write_cb cb) noexcept = 0;
         virtual int truncate(t_file file, uint64_t size, truncate_cb cb) noexcept = 0;
         virtual int close(t_file file, close_cb cb) noexcept = 0;
+
+        virtual inline int32_t default_file_mode() const noexcept
+        {
+            return 0664;
+        }
+
+        virtual inline int32_t default_dir_mode() const noexcept
+        {
+            return 0775;
+        }
+
+        virtual inline int32_t default_open_mode() const noexcept
+        {
+            return O_RDWR | O_CREAT | O_APPEND | O_NONBLOCK;
+        }
     };
 }
 

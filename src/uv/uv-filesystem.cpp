@@ -192,6 +192,13 @@ int vfs::uv::uv_filesystem::mkdir(vfs::uv::_uv_path_t path, int32_t mode, mkdir_
 
 // <editor-fold desc="mkdirs">
 
+struct mkdirs_cb_data
+{
+    vfs::uv::_uv_path_t p;
+    mkdir_cb cb;
+    int32_t mode;
+};
+
 int vfs::uv::uv_filesystem::mkdirs(vfs::uv::_uv_path_t path, int32_t mode, mkdirs_cb cb) noexcept
 {
     (void) path;

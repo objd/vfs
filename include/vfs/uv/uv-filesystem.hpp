@@ -34,12 +34,14 @@ namespace vfs::uv
     using _uv_stat_t = vfs::uv::uv_stat;
     using _uv_file_t = vfs::uv::uv_file<_uv_path_t>;
     using _uv_buf_t = vfs::buffer;
+    using _uv_filesystem = vfs::filesystem<_uv_path_t, _uv_stat_t, _uv_file_t, _uv_buf_t>;
 
     class uv_filesystem :
-        public filesystem<_uv_path_t, _uv_stat_t, _uv_file_t, _uv_buf_t>
+        public _uv_filesystem
     {
 
       private:
+
         std::unique_ptr<vfs::uv::uv_loop> _uv_loop;
 
       public:
@@ -61,6 +63,11 @@ namespace vfs::uv
             return *_uv_loop.get();
         }
 
+        using _uv_filesystem::mkdir;
+        using _uv_filesystem::mkdirs;
+        using _uv_filesystem::create;
+        using _uv_filesystem::open;
+
         int exists(_uv_path_t path, exists_cb cb) noexcept override;
         int stat(_uv_path_t path, stat_cb cb) noexcept override;
         int mkdir(_uv_path_t path, int32_t mode, mkdir_cb cb) noexcept override;
@@ -71,6 +78,7 @@ namespace vfs::uv
         int link(_uv_path_t path, _uv_path_t other_path, link_cb cb) noexcept override;
         int symlink(_uv_path_t path, _uv_path_t link_path, symlink_cb cb) noexcept override;
         int unlink(_uv_path_t path, unlink_cb cb) noexcept override;
+
         int open(_uv_path_t path, int32_t mode, int32_t flags, open_cb cb) noexcept override;
         int stat(_uv_file_t file, fstat_cb cb) noexcept override;
         int read(_uv_file_t file, _uv_buf_t buf, off64_t off, read_cb cb) noexcept override;
